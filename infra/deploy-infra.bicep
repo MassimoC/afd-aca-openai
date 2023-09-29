@@ -195,6 +195,7 @@ module modOpenAI  'CARML/cognitive-services/account/main.bicep' = {
     customSubDomainName: openAIName
     kind: 'OpenAI'
     sku:'S0'
+    disableLocalAuth:false
     location:'francecentral'
     tags:tags
     publicNetworkAccess:'Disabled'
