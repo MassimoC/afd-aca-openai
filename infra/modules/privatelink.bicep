@@ -1,17 +1,16 @@
 // Parameters
 param name string
 param location string
-
-
 param loadBalancerName string
 //MMCR
 //param loadBalancerResourceGroupName string
 param subnetId string
 param acaDefaultDomainName string
-
 param privateIPAllocationMethod string = 'Dynamic'
 param privateIPAddressVersion string = 'IPv4'
 param tags object = {}
+
+param pepName string
 
 
 var containerAppsDefaultDomainArray = split(acaDefaultDomainName, '.')
@@ -62,6 +61,25 @@ resource privateLinkService 'Microsoft.Network/privateLinkServices@2022-07-01' =
   }
 }
 
+resource privateEndpoint 'Microsoft.Network/privateEndpoints@2021-05-01' = {
+  name: pepName
+  location: location
+  properties: {
+    subnet: {
+      id: subnetId
+    }
+    privateLinkServiceConnections: [
+      {
+        name: 'privalink-container-apps'
+        properties: {
+          privateLinkServiceId: privateLinkService.id
+        }
+      }
+    ]
+  }
+}
+
 // Outputs
 output id string = privateLinkService.id
 output name string = privateLinkService.name
+output pepNICName string = split(privateEndpoint.properties.networkInterfaces[0].id, '/')[8]

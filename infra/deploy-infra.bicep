@@ -26,6 +26,7 @@ var apimName = 'apim-${projectName}'
 var aciName  = 'aci-${projectName}'
 var infrastructureResourceGroupName = '${resourceGroupName}_ME'
 var privateLinkServiceName = 'pls-${projectName}'
+var pepName = 'pe-${acaEnvironmentName}'
 var loadBalancerName = 'kubernetes-internal'
 var frontDoorName = 'afd${projectName}'
 
@@ -134,10 +135,25 @@ module modPrivateLinkService 'modules/privatelink.bicep' = {
     subnetId: modNetworking.outputs.fourthSubnetId
     location: location
     tags: tags
+    pepName:pepName
   }
   dependsOn: [
     modAcaEnvironment
   ]
+}
+
+module pdns 'modules/privatedns.bicep' = {
+  name: take('${deploymentName}-pdns', 58)
+  scope : resourceGroup(resourceGroupName)
+  params: {
+    pepNicName: modPrivateLinkService.outputs.pepNICName
+    vnetId: modNetworking.outputs.virtualNetworkId
+    domain: modAcaEnvironment.outputs.defaultDomain
+  }
+  dependsOn: [
+    modPrivateLinkService
+    modAcaEnvironment
+  ]  
 }
 
 module modApp 'modules/app.bicep' = {
