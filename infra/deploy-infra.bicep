@@ -22,6 +22,8 @@ var natGatewayName = 'nat-${projectName}'
 var logAnalyticsName = 'law-${projectName}'
 var acaEnvironmentName = 'env-${projectName}'
 var openAIName = 'ai-${projectName}'
+var apimName = 'apim-${projectName}'
+var aciName  = 'aci-${projectName}'
 var infrastructureResourceGroupName = '${resourceGroupName}_ME'
 var privateLinkServiceName = 'pls-${projectName}'
 var loadBalancerName = 'kubernetes-internal'
@@ -66,6 +68,20 @@ module modNetworking 'modules/network.bicep' = {
   ]
 }
 
+// Test
+module modAci 'modules/aci.bicep' = {
+  name: take('${deploymentName}-test', 58)
+  scope : resourceGroup(resourceGroupName)
+  params: {
+    name: aciName
+    subnetId: modNetworking.outputs.secondSubnetId
+    location: location
+  }
+  dependsOn: [
+    modNetworking
+  ]
+}
+
 // ACA environment
 module modAcaEnvironment  'CARML/app/managed-environment/main.bicep' = {
   name: take('${deploymentName}-acaenv', 58)
@@ -81,6 +97,26 @@ module modAcaEnvironment  'CARML/app/managed-environment/main.bicep' = {
     infrastructureSubnetId: modNetworking.outputs.fourthSubnetId
   }
   dependsOn: [ 
+    modResourceGroup 
+    modNetworking
+    modLogAnalytics
+  ]
+}
+
+module modApim 'CARML/api-management/service/main.bicep' = {
+  name: take('${deploymentName}-apim', 58)
+  scope : resourceGroup(resourceGroupName)
+  params: {
+    name: apimName
+    location: location
+    tags: tags
+    publisherEmail: 'massimo.crippa@codit.eu'
+    publisherName: projectName
+    virtualNetworkType:'Internal'
+    subnetResourceId : modNetworking.outputs.thirdSubnetId
+    minApiVersion: '2021-08-01'
+  }
+  dependsOn:[
     modResourceGroup 
     modNetworking
     modLogAnalytics
@@ -116,13 +152,9 @@ module modApp 'modules/app.bicep' = {
   }
 }
 
-var resourceToken = toLower(uniqueString(subscription().id, project, location))
-var openaiApiKeySecretName = 'openai-apikey'
-
 var chatGptDeploymentName = 'chat'
 var chatGptModelName = 'gpt-35-turbo'
 var chatGptModelVersion='0301'
-
 
 module modPrivateDnsZone 'CARML/network/private-dns-zone/main.bicep' = {
   name: take('${deploymentName}-dnszone', 58)
@@ -177,17 +209,20 @@ module modOpenAI  'CARML/cognitive-services/account/main.bicep' = {
   ]  
 }
 
+var apimHostName = split(modApim.outputs.gatewayURL, '/')[2]
 var openAIHostName = split(modOpenAI.outputs.endpoint, '/')[2]
 
 var origins  = [
   {
     domainprefix: 'lab1'
     originHostName: modApp.outputs.ingressFqdn
+    probePath: '/healthz'
     linkToDefaultDomain:'Enabled'
   }
   {
     domainprefix: 'lab2'
-    originHostName: openAIHostName
+    originHostName: apimHostName
+    probePath: '/status-0123456789abcdef'
     linkToDefaultDomain:'Disabled'
   }
 ]
@@ -208,6 +243,7 @@ module frontDoor 'modules/frontdoor.bicep' = {
     modPrivateLinkService
     modLogAnalytics
     modApp
+    modApim
   ]
 }
 

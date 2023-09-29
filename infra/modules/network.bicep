@@ -79,11 +79,11 @@ var secondSubnet = {
     natGateway: natGatewayEnabled ? {
       id: natGateway.id
     } : null
-    delegations: [
+    delegations:[
       {
-        name: 'aka-delegation'
-        properties: {
-          serviceName: 'Microsoft.App/environments'
+        name: 'aci-delegation'
+        properties:{
+          serviceName:'Microsoft.ContainerInstance/containerGroups'
         }
       }
     ]
@@ -99,12 +99,6 @@ var thirdSubnet = {
       id: natGateway.id
     } : null
     delegations: [
-      {
-        name: 'aka-delegation'
-        properties: {
-          serviceName: 'Microsoft.App/environments'
-        }
-      }
     ]
   }
 }

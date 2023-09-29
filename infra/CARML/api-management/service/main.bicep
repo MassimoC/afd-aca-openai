@@ -484,3 +484,6 @@ output systemAssignedPrincipalId string = systemAssignedIdentity && contains(ser
 
 @description('The location the resource was deployed into.')
 output location string = service.location
+
+@description('Gateway URL.')
+output gatewayURL string = service.properties.gatewayUrl

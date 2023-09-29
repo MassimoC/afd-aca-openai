@@ -19,7 +19,7 @@ param sampleSize int = 4
 param successfulSamplesRequired int = 3
 param additionalLatencyInMilliseconds int = 50
 
-param probePath string = '/healthz'
+//param probePath string = '/healthz'
 param probeRequestType string = 'GET'
 param probeProtocol string = 'Https'
 param probeIntervalInSeconds int = 60
@@ -30,7 +30,7 @@ param originPath string = '/'
 param ruleSets array = []
 param routePatternsToMatch array = [ '/*' ]
 param forwardingProtocol string = 'HttpsOnly'
-param linkToDefaultDomain string = 'Enabled'
+//param linkToDefaultDomain string = 'Enabled'
 param httpsRedirect string = 'Enabled'
 param endpointEnabledState string = 'Enabled'
 param wafPolicyMode string = 'Detection'
@@ -165,7 +165,7 @@ var parOrigins  = [for (origin, index) in origins: {
   sampleSize: sampleSize
   successfulSamplesRequired: successfulSamplesRequired
   additionalLatencyInMilliseconds: additionalLatencyInMilliseconds  
-  probePath: probePath
+  probePath: origin.probePath
   probeRequestType: probeRequestType
   probeProtocol: probeProtocol
   probeIntervalInSeconds: probeIntervalInSeconds
