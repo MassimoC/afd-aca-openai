@@ -32,6 +32,9 @@ param peSubnetName string = 'PrivateEndpointSubnet'
 param peSubnetAddressPrefix string = '10.4.0.0/27'
 param peSubnetNsgName string = 'peSubnetNsg'
 
+param plsSubnetName string = 'PrivateLinkSubnet'
+param plsSubnetAddressPrefix string = '10.5.0.0/27'
+
 // ********** NAT Gateway ***********
 
 param natGatewayName string
@@ -118,15 +121,23 @@ var peSubnet = {
     privateLinkServiceNetworkPolicies: 'Enabled'
   }
 }
+var plsSubnet = {
+  name: plsSubnetName
+  properties: {
+    addressPrefix: plsSubnetAddressPrefix
+    privateLinkServiceNetworkPolicies: 'Disabled'
+    delegations: []
+  }
+}
 
 var subnets = union(
   array(acagen2Subnet),
   array(testSubnet),
   array(apimSubnet),
   array(acagen1Subnet),
-  array(peSubnet)
+  array(peSubnet),
+  array(plsSubnet)
 )
-
 
 // Network Security Groups
 resource peSubnetNsg 'Microsoft.Network/networkSecurityGroups@2021-08-01' = {
@@ -264,8 +275,10 @@ output testSubnetId string = resourceId('Microsoft.Network/virtualNetworks/subne
 output apimSubnetId string = resourceId('Microsoft.Network/virtualNetworks/subnets', vnet.name, apimSubnetName)
 output acagen1SubnetId string = resourceId('Microsoft.Network/virtualNetworks/subnets', vnet.name, acagen1SubnetName)
 output peSubnetId string = resourceId('Microsoft.Network/virtualNetworks/subnets', vnet.name, peSubnetName)
+output plsSubnetId string = resourceId('Microsoft.Network/virtualNetworks/subnets', vnet.name, plsSubnetName)
 output acagen2SubnetName string = acagen2SubnetName
 output testSubnetName string = testSubnetName
 output apimSubnetName string = apimSubnetName
 output acagen1SubnetName string = acagen1SubnetName
 output peSubnetName string = peSubnetName
+output plsSubnetName string = plsSubnetName

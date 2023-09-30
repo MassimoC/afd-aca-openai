@@ -10,13 +10,22 @@ echo "${DBG}... Set subscription"
 
 #############################
 
-projectName='holaeay'
+projectName='holafay'
 
 #############################
 
+az bicep build --file deploy-infra.bicep 
+
+if [ $? -eq 0 ]; then
+  echo "... ... az bicep build succeeded"
+else
+  echo "... ... az bicep build failed"
+  exit
+fi
+
 echo "${DBG}... Trigger INFRA deployment on $projectName"
 
-RESULT=$(az stack sub create --name "oaistart" \
+RESULT=$(az stack sub create --name $projectName \
     --template-file deploy-infra.bicep \
     --parameters project=$projectName customDomainSuffix='apifirst.cloud' \
     --location westeurope \

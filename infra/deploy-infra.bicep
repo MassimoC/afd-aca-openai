@@ -114,6 +114,21 @@ module modAcaEnvironment  'CARML/app/managed-environment/main.bicep' = {
 }
 
 // ---------------------------------------------------------
+// Private DNS Zone for APIM 
+// ---------------------------------------------------------
+// module modPrivateDnsZoneApim 'CARML/network/private-dns-zone/main.bicep' = {
+//   name: take('${deploymentName}-dnszApim', 58)
+//   scope : resourceGroup(resourceGroupName)
+//   params: {
+//     name: 'azure-api.net'
+//     location:'global'
+//   }  
+//   dependsOn:[
+//     modNetworking
+//   ]
+// }
+
+// ---------------------------------------------------------
 // API Management
 // ---------------------------------------------------------
 module modApim 'CARML/api-management/service/main.bicep' = {
@@ -137,25 +152,7 @@ module modApim 'CARML/api-management/service/main.bicep' = {
 }
 
 // ---------------------------------------------------------
-// Private DNS Zone for APIM 
-// ---------------------------------------------------------
-module modPrivateDnsZoneApim 'CARML/network/private-dns-zone/main.bicep' = {
-  name: take('${deploymentName}-dnszApim', 58)
-  scope : resourceGroup(resourceGroupName)
-  params: {
-    name: 'azure-api.net'
-    location:'global'
-  }  
-  dependsOn:[
-    modNetworking
-    modApim
-  ]
-}
-
-// TODO : add the entries for gateway and portal
-
-// ---------------------------------------------------------
-// Private link Azure Container Apps
+// Private link for Frontdoor (used also for internal traffic to ACA)
 // ---------------------------------------------------------
 module modPrivateLinkService 'modules/privatelink.bicep' = {
   name: take('${deploymentName}-pls', 58)
@@ -165,7 +162,8 @@ module modPrivateLinkService 'modules/privatelink.bicep' = {
     loadBalancerName: loadBalancerName
     //loadBalancerResourceGroupName: infrastructureResourceGroupName
     acaDefaultDomainName: modAcaEnvironment.outputs.defaultDomain
-    subnetId: modNetworking.outputs.peSubnetId
+    subnetId: modNetworking.outputs.plsSubnetId
+    peSubnetId :modNetworking.outputs.peSubnetId
     location: location
     tags: tags
     pepName:pepName

@@ -5,6 +5,7 @@ param loadBalancerName string
 //MMCR
 //param loadBalancerResourceGroupName string
 param subnetId string
+param peSubnetId string
 param acaDefaultDomainName string
 param privateIPAllocationMethod string = 'Dynamic'
 param privateIPAddressVersion string = 'IPv4'
@@ -66,7 +67,7 @@ resource privateEndpoint 'Microsoft.Network/privateEndpoints@2021-05-01' = {
   location: location
   properties: {
     subnet: {
-      id: subnetId
+      id: peSubnetId
     }
     privateLinkServiceConnections: [
       {
