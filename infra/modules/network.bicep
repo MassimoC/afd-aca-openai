@@ -13,17 +13,17 @@ param tags object = {}
 
 // ********** ACA Subnets ***********
 
-param firstSubnetName string = 'FirstSubnet'
-param firstSubnetAddressPrefix string = '10.0.0.0/27'
+param acagen2SubnetName string = 'acagen2Subnet'
+param acagen2SubnetAddressPrefix string = '10.0.0.0/27'
 
-param secondSubnetName string = 'SecondSubnet'
-param secondSubnetAddressPrefix string = '10.1.0.0/27'
+param testSubnetName string = 'testSubnet'
+param testSubnetAddressPrefix string = '10.1.0.0/27'
 
-param thirdSubnetName string = 'ThirdSubnet'
-param thirdSubnetAddressPrefix string = '10.2.0.0/27'
+param apimSubnetName string = 'apimSubnet'
+param apimSubnetAddressPrefix string = '10.2.0.0/27'
 
-param fourthSubnetName string = 'FourthSubnet'
-param fourthSubnetAddressPrefix string = '10.3.0.0/23'
+param acagen1SubnetName string = 'acagen1Subnet'
+param acagen1SubnetAddressPrefix string = '10.3.0.0/23'
 
 // ********** PE Subnets ***********
 
@@ -51,10 +51,10 @@ param acrPrivateEndpointName string = 'AcrPrivateEndpoint'
 @description('Specifies the resource id of the Azure Container Registry.')
 param acrId string = ''
 
-var firstSubnet = {
-  name: firstSubnetName
+var acagen2Subnet = {
+  name: acagen2SubnetName
   properties: {
-    addressPrefix: firstSubnetAddressPrefix
+    addressPrefix: acagen2SubnetAddressPrefix
     privateEndpointNetworkPolicies: 'Disabled'
     privateLinkServiceNetworkPolicies: 'Enabled'
     natGateway: natGatewayEnabled ? {
@@ -70,10 +70,10 @@ var firstSubnet = {
     ]
   }
 }
-var secondSubnet = {
-  name: secondSubnetName
+var testSubnet = {
+  name: testSubnetName
   properties: {
-    addressPrefix: secondSubnetAddressPrefix
+    addressPrefix: testSubnetAddressPrefix
     privateEndpointNetworkPolicies: 'Disabled'
     privateLinkServiceNetworkPolicies: 'Enabled'
     natGateway: natGatewayEnabled ? {
@@ -89,10 +89,10 @@ var secondSubnet = {
     ]
   }
 }
-var thirdSubnet = {
-  name: thirdSubnetName
+var apimSubnet = {
+  name: apimSubnetName
   properties: {
-    addressPrefix: thirdSubnetAddressPrefix
+    addressPrefix: apimSubnetAddressPrefix
     privateEndpointNetworkPolicies: 'Disabled'
     privateLinkServiceNetworkPolicies: 'Enabled'
     natGateway: natGatewayEnabled ? {
@@ -102,10 +102,10 @@ var thirdSubnet = {
     ]
   }
 }
-var fourthSubnet = {
-  name: fourthSubnetName
+var acagen1Subnet = {
+  name: acagen1SubnetName
   properties: {
-    addressPrefix: fourthSubnetAddressPrefix
+    addressPrefix: acagen1SubnetAddressPrefix
     privateLinkServiceNetworkPolicies: 'Disabled'
     delegations: []
   }
@@ -120,10 +120,10 @@ var peSubnet = {
 }
 
 var subnets = union(
-  array(firstSubnet),
-  array(secondSubnet),
-  array(thirdSubnet),
-  array(fourthSubnet),
+  array(acagen2Subnet),
+  array(testSubnet),
+  array(apimSubnet),
+  array(acagen1Subnet),
   array(peSubnet)
 )
 
@@ -259,13 +259,13 @@ resource acrPrivateDnsZoneGroup 'Microsoft.Network/privateEndpoints/privateDnsZo
 // Outputs
 output virtualNetworkId string = vnet.id
 output virtualNetworkName string = vnet.name
-output firstSubnetId string = resourceId('Microsoft.Network/virtualNetworks/subnets', vnet.name, firstSubnetName)
-output secondSubnetId string = resourceId('Microsoft.Network/virtualNetworks/subnets', vnet.name, secondSubnetName)
-output thirdSubnetId string = resourceId('Microsoft.Network/virtualNetworks/subnets', vnet.name, thirdSubnetName)
-output fourthSubnetId string = resourceId('Microsoft.Network/virtualNetworks/subnets', vnet.name, fourthSubnetName)
+output acagen2SubnetId string = resourceId('Microsoft.Network/virtualNetworks/subnets', vnet.name, acagen2SubnetName)
+output testSubnetId string = resourceId('Microsoft.Network/virtualNetworks/subnets', vnet.name, testSubnetName)
+output apimSubnetId string = resourceId('Microsoft.Network/virtualNetworks/subnets', vnet.name, apimSubnetName)
+output acagen1SubnetId string = resourceId('Microsoft.Network/virtualNetworks/subnets', vnet.name, acagen1SubnetName)
 output peSubnetId string = resourceId('Microsoft.Network/virtualNetworks/subnets', vnet.name, peSubnetName)
-output firstSubnetName string = firstSubnetName
-output secondSubnetName string = secondSubnetName
-output thirdSubnetName string = thirdSubnetName
-output fourthSubnetName string = fourthSubnetName
+output acagen2SubnetName string = acagen2SubnetName
+output testSubnetName string = testSubnetName
+output apimSubnetName string = apimSubnetName
+output acagen1SubnetName string = acagen1SubnetName
 output peSubnetName string = peSubnetName

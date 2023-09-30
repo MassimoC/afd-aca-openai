@@ -10,7 +10,7 @@ echo "${DBG}... Set subscription"
 
 #############################
 
-projectName='holaday'
+projectName='holaeay'
 
 #############################
 

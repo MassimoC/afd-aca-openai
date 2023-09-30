@@ -43,7 +43,7 @@ param securityPolicyPatternsToMatch array = [ '/*' ]
 
 // Variables
 var originGroupName = '${frontDoorName}origingrp'
-var endpointName = '${frontDoorName}endppoint'
+var endpointName = '${frontDoorName}endpoint'
 var wafPolicyName = '${frontDoorName}wafpolicy'
 var securityPolicyName = '${frontDoorName}securitypolicy'
 

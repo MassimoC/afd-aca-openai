@@ -30,7 +30,9 @@ var pepName = 'pe-${acaEnvironmentName}'
 var loadBalancerName = 'kubernetes-internal'
 var frontDoorName = 'afd${projectName}'
 
+// ---------------------------------------------------------
 // Resource Group
+// ---------------------------------------------------------
 module modResourceGroup 'CARML/resources/resource-group/main.bicep' = {
   name: take('${deploymentName}-rg', 58)
   params: {
@@ -39,8 +41,9 @@ module modResourceGroup 'CARML/resources/resource-group/main.bicep' = {
     tags: tags
   }
 }
-
+// ---------------------------------------------------------
 // Log Analytics Workspace
+// ---------------------------------------------------------
 module modLogAnalytics 'CARML/operational-insights/workspace/main.bicep' ={
   name: take('${deploymentName}-law', 58)
   scope : resourceGroup(resourceGroupName)
@@ -54,7 +57,9 @@ module modLogAnalytics 'CARML/operational-insights/workspace/main.bicep' ={
   ]
 }
 
+// ---------------------------------------------------------
 // Networking
+// ---------------------------------------------------------
 module modNetworking 'modules/network.bicep' = {
   name: take('${deploymentName}-networking', 58)
   scope : resourceGroup(resourceGroupName)
@@ -69,13 +74,15 @@ module modNetworking 'modules/network.bicep' = {
   ]
 }
 
-// Test
+// ---------------------------------------------------------
+// Sort of jumpbox for testing purposes
+// ---------------------------------------------------------
 module modAci 'modules/aci.bicep' = {
   name: take('${deploymentName}-test', 58)
   scope : resourceGroup(resourceGroupName)
   params: {
     name: aciName
-    subnetId: modNetworking.outputs.secondSubnetId
+    subnetId: modNetworking.outputs.testSubnetId
     location: location
   }
   dependsOn: [
@@ -83,7 +90,9 @@ module modAci 'modules/aci.bicep' = {
   ]
 }
 
-// ACA environment
+// ---------------------------------------------------------
+// ACA environment GEN1
+// ---------------------------------------------------------
 module modAcaEnvironment  'CARML/app/managed-environment/main.bicep' = {
   name: take('${deploymentName}-acaenv', 58)
   scope : resourceGroup(resourceGroupName)
@@ -95,7 +104,7 @@ module modAcaEnvironment  'CARML/app/managed-environment/main.bicep' = {
     enableDefaultTelemetry: false
     internal: true
     //infrastructureResourceGroup : infrastructureResourceGroupName
-    infrastructureSubnetId: modNetworking.outputs.fourthSubnetId
+    infrastructureSubnetId: modNetworking.outputs.acagen1SubnetId
   }
   dependsOn: [ 
     modResourceGroup 
@@ -104,6 +113,9 @@ module modAcaEnvironment  'CARML/app/managed-environment/main.bicep' = {
   ]
 }
 
+// ---------------------------------------------------------
+// API Management
+// ---------------------------------------------------------
 module modApim 'CARML/api-management/service/main.bicep' = {
   name: take('${deploymentName}-apim', 58)
   scope : resourceGroup(resourceGroupName)
@@ -114,7 +126,7 @@ module modApim 'CARML/api-management/service/main.bicep' = {
     publisherEmail: 'massimo.crippa@codit.eu'
     publisherName: projectName
     virtualNetworkType:'Internal'
-    subnetResourceId : modNetworking.outputs.thirdSubnetId
+    subnetResourceId : modNetworking.outputs.apimSubnetId
     minApiVersion: '2021-08-01'
   }
   dependsOn:[
@@ -124,6 +136,27 @@ module modApim 'CARML/api-management/service/main.bicep' = {
   ]
 }
 
+// ---------------------------------------------------------
+// Private DNS Zone for APIM 
+// ---------------------------------------------------------
+module modPrivateDnsZoneApim 'CARML/network/private-dns-zone/main.bicep' = {
+  name: take('${deploymentName}-dnszApim', 58)
+  scope : resourceGroup(resourceGroupName)
+  params: {
+    name: 'azure-api.net'
+    location:'global'
+  }  
+  dependsOn:[
+    modNetworking
+    modApim
+  ]
+}
+
+// TODO : add the entries for gateway and portal
+
+// ---------------------------------------------------------
+// Private link Azure Container Apps
+// ---------------------------------------------------------
 module modPrivateLinkService 'modules/privatelink.bicep' = {
   name: take('${deploymentName}-pls', 58)
   scope : resourceGroup(resourceGroupName)
@@ -132,7 +165,7 @@ module modPrivateLinkService 'modules/privatelink.bicep' = {
     loadBalancerName: loadBalancerName
     //loadBalancerResourceGroupName: infrastructureResourceGroupName
     acaDefaultDomainName: modAcaEnvironment.outputs.defaultDomain
-    subnetId: modNetworking.outputs.fourthSubnetId
+    subnetId: modNetworking.outputs.peSubnetId
     location: location
     tags: tags
     pepName:pepName
@@ -142,6 +175,9 @@ module modPrivateLinkService 'modules/privatelink.bicep' = {
   ]
 }
 
+// ---------------------------------------------------------
+// Private DNS ACA (private DNS zone, DNS entry and VNET link)
+// ---------------------------------------------------------
 module pdns 'modules/privatedns.bicep' = {
   name: take('${deploymentName}-pdns', 58)
   scope : resourceGroup(resourceGroupName)
@@ -156,6 +192,9 @@ module pdns 'modules/privatedns.bicep' = {
   ]  
 }
 
+// ---------------------------------------------------------
+// Container Apps Application
+// ---------------------------------------------------------
 module modApp 'modules/app.bicep' = {
   name: take('${deploymentName}-app', 58)
   scope : resourceGroup(resourceGroupName)
@@ -172,6 +211,9 @@ var chatGptDeploymentName = 'chat'
 var chatGptModelName = 'gpt-35-turbo'
 var chatGptModelVersion='0301'
 
+// ---------------------------------------------------------
+// Private DNS Zone for OpenAI
+// ---------------------------------------------------------
 module modPrivateDnsZone 'CARML/network/private-dns-zone/main.bicep' = {
   name: take('${deploymentName}-dnszone', 58)
   scope : resourceGroup(resourceGroupName)
@@ -183,10 +225,14 @@ module modPrivateDnsZone 'CARML/network/private-dns-zone/main.bicep' = {
     modNetworking
   ]
 }
+
 var privateDnsZoneGroup = {
   privateDNSResourceIds: [ modPrivateDnsZone.outputs.resourceId ]
 }
 
+// ---------------------------------------------------------
+// Azure OpenAI
+// ---------------------------------------------------------
 module modOpenAI  'CARML/cognitive-services/account/main.bicep' = {
   name: take('${deploymentName}-openai', 58)
   scope : resourceGroup(resourceGroupName)
@@ -201,7 +247,7 @@ module modOpenAI  'CARML/cognitive-services/account/main.bicep' = {
     publicNetworkAccess:'Disabled'
     privateEndpoints: [
       {
-        subnetResourceId : modNetworking.outputs.fourthSubnetId
+        subnetResourceId : modNetworking.outputs.peSubnetId
         service: 'account'
         privateDnsZoneGroup: privateDnsZoneGroup
       }
@@ -226,7 +272,14 @@ module modOpenAI  'CARML/cognitive-services/account/main.bicep' = {
   ]  
 }
 
+// ---------------------------------------------------------
+// Azure Frontdoor premium
+// ---------------------------------------------------------
+
+// APIM internal and PLS is mutually exclusive (one or the other)
 var apimHostName = split(modApim.outputs.gatewayURL, '/')[2]
+
+// open api REST api do not expose a probe endpoint
 var openAIHostName = split(modOpenAI.outputs.endpoint, '/')[2]
 
 var origins  = [
@@ -238,10 +291,16 @@ var origins  = [
   }
   {
     domainprefix: 'lab2'
-    originHostName: apimHostName
-    probePath: '/status-0123456789abcdef'
+    originHostName: modApp.outputs.ingressFqdn
+    probePath: '/healthz'
     linkToDefaultDomain:'Disabled'
-  }
+  }  
+  // {
+  //   domainprefix: 'lab2'
+  //   originHostName: apimHostName
+  //   probePath: '/status-0123456789abcdef'
+  //   linkToDefaultDomain:'Disabled'
+  // }
 ]
 
 module frontDoor 'modules/frontdoor.bicep' = {
