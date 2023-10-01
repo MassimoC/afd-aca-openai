@@ -1,11 +1,9 @@
+param ipv4Address string
 param vnetId string
 param domain string
-param nicName string = ''
+param apimServiceName string
 
 
-resource nic 'Microsoft.Network/networkInterfaces@2021-05-01' existing = {
-  name: nicName
-}
 
 resource privateDnsZone 'Microsoft.Network/privateDnsZones@2020-06-01' = {
   name: domain
@@ -13,12 +11,12 @@ resource privateDnsZone 'Microsoft.Network/privateDnsZones@2020-06-01' = {
 }
 
 resource privateDnsZoneEntry 'Microsoft.Network/privateDnsZones/A@2020-06-01' = {
-  name: '*'
+  name: apimServiceName
   parent: privateDnsZone
   properties: {
     aRecords: [
       {
-        ipv4Address: nic.properties.ipConfigurations[0].properties.privateIPAddress
+        ipv4Address: ipv4Address
       }
     ]
     ttl: 3600

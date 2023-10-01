@@ -30,10 +30,15 @@ param acagen1SubnetAddressPrefix string = '10.3.0.0/23'
 
 param peSubnetName string = 'PrivateEndpointSubnet'
 param peSubnetAddressPrefix string = '10.4.0.0/27'
-param peSubnetNsgName string = 'peSubnetNsg'
-
 param plsSubnetName string = 'PrivateLinkSubnet'
 param plsSubnetAddressPrefix string = '10.5.0.0/27'
+
+
+// ********** NSGs ***********
+
+param peSubnetNsgName string = 'peSubnetNsg'
+param apimSubnetNsgName string = 'apimSubnetNsg'
+
 
 // ********** NAT Gateway ***********
 
@@ -96,6 +101,9 @@ var apimSubnet = {
   name: apimSubnetName
   properties: {
     addressPrefix: apimSubnetAddressPrefix
+    networkSecurityGroup: {
+      id: apimSubnetNsg.id
+    }
     privateEndpointNetworkPolicies: 'Disabled'
     privateLinkServiceNetworkPolicies: 'Enabled'
     natGateway: natGatewayEnabled ? {
@@ -163,6 +171,213 @@ resource peSubnetNsg 'Microsoft.Network/networkSecurityGroups@2021-08-01' = {
   }
 }
 
+resource apimSubnetNsg 'Microsoft.Network/networkSecurityGroups@2021-08-01' = {
+  name: apimSubnetNsgName
+  location: location
+  properties: {
+    securityRules: [
+      {
+        name: 'ClientCommunicationToAPIManagementInbound'
+        properties: {
+          protocol: 'Tcp'
+          sourcePortRange: '*'
+          destinationPortRange: '80'
+          //sourceAddressPrefix: (allowTrafficOnlyFromFrontDoor ? 'AzureFrontDoor.Backend' : 'Internet')
+          sourceAddressPrefix: 'VirtualNetwork'
+          destinationAddressPrefix: 'VirtualNetwork'
+          access: 'Allow'
+          priority: 100
+          direction: 'Inbound'
+        }
+      }
+      {
+        name: 'SecureClientCommunicationToAPIManagementInbound'
+        properties: {
+          protocol: 'Tcp'
+          sourcePortRange: '*'
+          destinationPortRange: '443'
+          sourceAddressPrefix: 'VirtualNetwork'
+          destinationAddressPrefix: 'VirtualNetwork'
+          access: 'Allow'
+          priority: 110
+          direction: 'Inbound'
+        }
+      }
+      {
+        name: 'ManagementEndpointForAzurePortalAndPowershellInbound'
+        properties: {
+          protocol: 'Tcp'
+          sourcePortRange: '*'
+          destinationPortRange: '3443'
+          sourceAddressPrefix: 'ApiManagement'
+          destinationAddressPrefix: 'VirtualNetwork'
+          access: 'Allow'
+          priority: 120
+          direction: 'Inbound'
+        }
+      }
+      {
+        name: 'DependencyOnRedisCacheInbound'
+        properties: {
+          protocol: 'Tcp'
+          sourcePortRange: '*'
+          destinationPortRange: '6381-6383'
+          sourceAddressPrefix: 'VirtualNetwork'
+          destinationAddressPrefix: 'VirtualNetwork'
+          access: 'Allow'
+          priority: 130
+          direction: 'Inbound'
+        }
+      }
+      {
+        name: 'AzureInfrastructureLoadBalancer'
+        properties: {
+          protocol: 'Tcp'
+          sourcePortRange: '*'
+          destinationPortRange: '*'
+          sourceAddressPrefix: 'AzureLoadBalancer'
+          destinationAddressPrefix: 'VirtualNetwork'
+          access: 'Allow'
+          priority: 180
+          direction: 'Inbound'
+        }
+      }
+      {
+        name: 'DependencyOnAzureSQLOutbound'
+        properties: {
+          protocol: 'Tcp'
+          sourcePortRange: '*'
+          destinationPortRange: '1433'
+          sourceAddressPrefix: 'VirtualNetwork'
+          destinationAddressPrefix: 'Sql'
+          access: 'Allow'
+          priority: 140
+          direction: 'Outbound'
+        }
+      }
+      {
+        name: 'DependencyForLogToEventHubPolicyOutbound'
+        properties: {
+          protocol: '*'
+          sourcePortRange: '*'
+          destinationPortRange: '5671'
+          sourceAddressPrefix: 'VirtualNetwork'
+          destinationAddressPrefix: 'EventHub'
+          access: 'Allow'
+          priority: 150
+          direction: 'Outbound'
+        }
+      }
+      {
+        name: 'DependencyOnRedisCacheOutbound'
+        properties: {
+          protocol: 'Tcp'
+          sourcePortRange: '*'
+          destinationPortRange: '6381-6383'
+          sourceAddressPrefix: 'VirtualNetwork'
+          destinationAddressPrefix: 'VirtualNetwork'
+          access: 'Allow'
+          priority: 160
+          direction: 'Outbound'
+        }
+      }
+      {
+        name: 'DependencyOnAzureFileShareForGitOutbound'
+        properties: {
+          protocol: 'Tcp'
+          sourcePortRange: '*'
+          destinationPortRange: '445'
+          sourceAddressPrefix: 'VirtualNetwork'
+          destinationAddressPrefix: 'Storage'
+          access: 'Allow'
+          priority: 170
+          direction: 'Outbound'
+        }
+      }
+      {
+        name: 'PublishDiagnosticLogsAndMetricsOutbound'
+        properties: {
+          description: 'APIM Logs and Metrics for consumption by admins and your IT team are all part of the management plane'
+          protocol: 'Tcp'
+          sourcePortRange: '*'
+          sourceAddressPrefix: 'VirtualNetwork'
+          destinationAddressPrefix: 'AzureMonitor'
+          access: 'Allow'
+          priority: 185
+          direction: 'Outbound'
+          destinationPortRanges: [
+            '443'
+            '12000'
+            '1886'
+          ]
+        }
+      }
+      {
+        name: 'ConnectToSmtpRelayForSendingEmailsOutbound'
+        properties: {
+          description: 'APIM features the ability to generate email traffic as part of the data plane and the management plane'
+          protocol: 'Tcp'
+          sourcePortRange: '*'
+          sourceAddressPrefix: 'VirtualNetwork'
+          destinationAddressPrefix: 'Internet'
+          access: 'Allow'
+          priority: 190
+          direction: 'Outbound'
+          destinationPortRanges: [
+            '25'
+            '587'
+            '25028'
+          ]
+        }
+      }
+      {
+        name: 'AuthenticateToAzureActiveDirectoryOutbound'
+        properties: {
+          description: 'Connect to Azure Active Directory for Developer Portal Authentication or for Oauth2 flow during any Proxy Authentication'
+          protocol: 'Tcp'
+          sourcePortRange: '*'
+          sourceAddressPrefix: 'VirtualNetwork'
+          destinationAddressPrefix: 'AzureActiveDirectory'
+          access: 'Allow'
+          priority: 200
+          direction: 'Outbound'
+          destinationPortRanges: [
+            '80'
+            '443'
+          ]
+        }
+      }
+      {
+        name: 'DependencyOnAzureStorageOutbound'
+        properties: {
+          description: 'APIM service dependency on Azure Blob and Azure Table Storage'
+          protocol: 'Tcp'
+          sourcePortRange: '*'
+          destinationPortRange: '443'
+          sourceAddressPrefix: 'VirtualNetwork'
+          destinationAddressPrefix: 'Storage'
+          access: 'Allow'
+          priority: 100
+          direction: 'Outbound'
+        }
+      }
+      {
+        name: 'PublishMonitoringLogsOutbound'
+        properties: {
+          protocol: 'Tcp'
+          sourcePortRange: '*'
+          destinationPortRange: '443'
+          sourceAddressPrefix: 'VirtualNetwork'
+          destinationAddressPrefix: 'AzureCloud'
+          access: 'Allow'
+          priority: 300
+          direction: 'Outbound'
+        }
+      }
+    ]
+  }
+}
+
 // Virtual Network
 resource vnet 'Microsoft.Network/virtualNetworks@2021-08-01' = {
   name: virtualNetworkName
@@ -176,6 +391,9 @@ resource vnet 'Microsoft.Network/virtualNetworks@2021-08-01' = {
     }
     subnets: subnets
   }
+  dependsOn: [
+    apimSubnetNsg
+  ]
 }
 
 // NAT Gateway

@@ -17,9 +17,9 @@ projectName='holafay'
 az bicep build --file deploy-infra.bicep 
 
 if [ $? -eq 0 ]; then
-  echo "... ... az bicep build succeeded"
+  echo "... ... az bicep build succeeded."
 else
-  echo "... ... az bicep build failed"
+  echo "... ... az bicep build failed."
   exit
 fi
 

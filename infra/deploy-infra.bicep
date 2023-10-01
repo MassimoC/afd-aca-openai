@@ -114,21 +114,6 @@ module modAcaEnvironment  'CARML/app/managed-environment/main.bicep' = {
 }
 
 // ---------------------------------------------------------
-// Private DNS Zone for APIM 
-// ---------------------------------------------------------
-// module modPrivateDnsZoneApim 'CARML/network/private-dns-zone/main.bicep' = {
-//   name: take('${deploymentName}-dnszApim', 58)
-//   scope : resourceGroup(resourceGroupName)
-//   params: {
-//     name: 'azure-api.net'
-//     location:'global'
-//   }  
-//   dependsOn:[
-//     modNetworking
-//   ]
-// }
-
-// ---------------------------------------------------------
 // API Management
 // ---------------------------------------------------------
 module modApim 'CARML/api-management/service/main.bicep' = {
@@ -150,6 +135,25 @@ module modApim 'CARML/api-management/service/main.bicep' = {
     modLogAnalytics
   ]
 }
+
+// ---------------------------------------------------------
+// Private DNS Zone for APIM 
+// ---------------------------------------------------------
+
+module apimDns 'modules/privatednsapim.bicep' = {
+  name: take('${deploymentName}-apimdns', 58)
+  scope : resourceGroup(resourceGroupName)
+  params: {
+    ipv4Address: modApim.outputs.privateIPs[0]
+    vnetId: modNetworking.outputs.virtualNetworkId
+    domain: 'azure-api.net'
+    apimServiceName: modApim.outputs.name
+  }
+  dependsOn: [
+    modApim
+  ]  
+}
+
 
 // ---------------------------------------------------------
 // Private link for Frontdoor (used also for internal traffic to ACA)
@@ -180,9 +184,9 @@ module pdns 'modules/privatedns.bicep' = {
   name: take('${deploymentName}-pdns', 58)
   scope : resourceGroup(resourceGroupName)
   params: {
-    pepNicName: modPrivateLinkService.outputs.pepNICName
     vnetId: modNetworking.outputs.virtualNetworkId
     domain: modAcaEnvironment.outputs.defaultDomain
+    nicName: modPrivateLinkService.outputs.pepNICName
   }
   dependsOn: [
     modPrivateLinkService
@@ -218,6 +222,13 @@ module modPrivateDnsZone 'CARML/network/private-dns-zone/main.bicep' = {
   params: {
     name: 'privatelink.openai.azure.com'
     location:'global'
+    virtualNetworkLinks: [
+      {
+        name: 'openai-vnet-link'
+        virtualNetworkResourceId : modNetworking.outputs.virtualNetworkId
+        registrationEnabled: true
+      }
+    ]
   }  
   dependsOn:[
     modNetworking

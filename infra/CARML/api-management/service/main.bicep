@@ -487,3 +487,6 @@ output location string = service.location
 
 @description('Gateway URL.')
 output gatewayURL string = service.properties.gatewayUrl
+
+@description('Gateway private IPs.')
+output privateIPs array = service.properties.privateIPAddresses
