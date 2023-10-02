@@ -66,7 +66,7 @@ module modApplicationInsights 'CARML/insights/component/main.bicep' = {
   scope : resourceGroup(resourceGroupName)
   params: {
     name:appInsightsName
-    workspaceResourceId: modLogAnalytics.outputs.logAnalyticsWorkspaceId
+    workspaceResourceId: modLogAnalytics.outputs.resourceId
     retentionInDays:30
     location:location
     tags: tags
