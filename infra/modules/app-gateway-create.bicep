@@ -1,33 +1,36 @@
-param apimName string
+param apiServicemName string
 param apiName string
-param gwName string
-param projectCode string
-param appInsightsKey string
-param appInsightsId string
+param gatewayName string
+param enableAppInsights bool = false
+param appInsightsKey string = ''
+param appInsightsResourceId string = ''
+
+
+var apiFullName = '${apiName}API'
 
 resource apim 'Microsoft.ApiManagement/service@2021-08-01' existing = {
-  name : apimName
+  name : apiServicemName
 }
 
 resource gateway 'Microsoft.ApiManagement/service/gateways@2021-08-01' = {
-  name: gwName
+  name: gatewayName
   parent: apim
   properties:{
-    description: 'Ingress for Azure Container Apps'
+    description: 'APIM on Azure Container Apps'
     locationData: {
-      name: '${projectCode}-on-aca'
+      name: '${gatewayName}-on-aca'
       countryOrRegion: 'Cloud'
     }
   }
 }
 
 resource facadeApi 'Microsoft.ApiManagement/service/apis@2021-08-01' = {
-  name: apiName
+  name: apiFullName
   parent: apim
   properties: {
-    path: '/${projectCode}'
+    path: '/${apiName}'
     apiType: 'http'
-    displayName: '${projectCode} API'
+    displayName: '${apiName} API'
     subscriptionRequired: true
     subscriptionKeyParameterNames: {
       header: 'apiKey'
@@ -41,7 +44,7 @@ resource facadeApi 'Microsoft.ApiManagement/service/apis@2021-08-01' = {
 }
 
 resource associateAPItoLocalGateway 'Microsoft.ApiManagement/service/gateways/apis@2021-08-01' = {
-  name: '${projectCode}API'
+  name: apiFullName
   parent: gateway
   properties: {}
   dependsOn:[
@@ -58,7 +61,7 @@ resource throttlingPolicy 'Microsoft.ApiManagement/service/apis/policies@2021-08
   }
 }
 
-resource nvAppInsightsKey 'Microsoft.ApiManagement/service/namedValues@2022-08-01' = {
+resource nvAppInsightsKey 'Microsoft.ApiManagement/service/namedValues@2022-08-01' = if (enableAppInsights) {
   name: 'appinsights-key'
   parent: apim
   properties: {
@@ -69,13 +72,13 @@ resource nvAppInsightsKey 'Microsoft.ApiManagement/service/namedValues@2022-08-0
   }
 }
 
-resource loggerAppInsights 'Microsoft.ApiManagement/service/loggers@2022-08-01' = {
+resource loggerAppInsights 'Microsoft.ApiManagement/service/loggers@2022-08-01' = if (enableAppInsights) {
   name: 'applicationinsights'
   parent: apim
   properties: {
     loggerType: 'applicationInsights'
     description: 'Application Insights instance dedicated to APIM logging'
-    resourceId: appInsightsId
+    resourceId: appInsightsResourceId
     credentials: {
       instrumentationKey: '{{ appinsights-key }}'
     }
@@ -85,7 +88,7 @@ resource loggerAppInsights 'Microsoft.ApiManagement/service/loggers@2022-08-01' 
   ]
 }
 
-resource facadeApiMonitoring 'Microsoft.ApiManagement/service/apis/diagnostics@2022-08-01' = {
+resource facadeApiMonitoring 'Microsoft.ApiManagement/service/apis/diagnostics@2022-08-01' = if (enableAppInsights) {
   name: 'applicationinsights'
   parent: facadeApi
   properties: {

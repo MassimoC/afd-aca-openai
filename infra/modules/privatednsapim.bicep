@@ -3,8 +3,6 @@ param vnetId string
 param domain string
 param apimServiceName string
 
-
-
 resource privateDnsZone 'Microsoft.Network/privateDnsZones@2020-06-01' = {
   name: domain
   location: 'Global'

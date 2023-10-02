@@ -20,6 +20,7 @@ var resourceGroupName = 'rg-${projectName}'
 var virtualNetworkName = 'vnet-${projectName}'
 var natGatewayName = 'nat-${projectName}'
 var logAnalyticsName = 'law-${projectName}'
+var appInsightsName = 'ains-${projectName}'
 var acaEnvironmentName = 'env-${projectName}'
 var openAIName = 'ai-${projectName}'
 var apimName = 'apim-${projectName}'
@@ -44,7 +45,7 @@ module modResourceGroup 'CARML/resources/resource-group/main.bicep' = {
 // ---------------------------------------------------------
 // Log Analytics Workspace
 // ---------------------------------------------------------
-module modLogAnalytics 'CARML/operational-insights/workspace/main.bicep' ={
+module modLogAnalytics 'CARML/operational-insights/workspace/main.bicep' = {
   name: take('${deploymentName}-law', 58)
   scope : resourceGroup(resourceGroupName)
   params: {
@@ -54,6 +55,24 @@ module modLogAnalytics 'CARML/operational-insights/workspace/main.bicep' ={
   }
   dependsOn: [
     modResourceGroup
+  ]
+}
+
+// ---------------------------------------------------------
+// Application Insights
+// ---------------------------------------------------------
+module modApplicationInsights 'CARML/insights/component/main.bicep' = {
+  name: take('${deploymentName}-ains', 58)
+  scope : resourceGroup(resourceGroupName)
+  params: {
+    name:appInsightsName
+    workspaceResourceId: modLogAnalytics.outputs.logAnalyticsWorkspaceId
+    retentionInDays:30
+    location:location
+    tags: tags
+  }
+  dependsOn: [
+    modLogAnalytics
   ]
 }
 
@@ -331,6 +350,32 @@ module frontDoor 'modules/frontdoor.bicep' = {
     modApim
   ]
 }
+
+// ---------------------------------------------------------
+// APIM self hosted gateway
+// ---------------------------------------------------------
+
+module createApimGateway 'modules/app-gateway-create.bicep' = {
+  name: take('${deploymentName}-apimgw', 58)
+  scope : resourceGroup(resourceGroupName)
+  params: {
+    apiName: 'test'
+    apiServicemName: modApim.outputs.name
+    gatewayName: 'gwapim'
+    enableAppInsights: true
+    appInsightsResourceId: modApplicationInsights.outputs.resourceId
+    appInsightsKey: modApplicationInsights.outputs.instrumentationKey
+  }
+  dependsOn: [ 
+    modApim
+  ]
+}
+
+// Get APIM token
+
+// DEPLOYMENT=$(az deployment group create -g $RESOURCE_GROUP \
+//   -f ./bicep/aca-apim-ingress.bicep \
+//   -p apimName=$APIM_NAME projectCode=$PROJECT environmentId=$CONTAINERAPPS_ENVIRONMENTID gatewayToken="$GW_TOKEN" gatewayTag="$GATEWAY_TAG")
 
 output rgName string = modResourceGroup.outputs.name
 output plsName string = modPrivateLinkService.outputs.name

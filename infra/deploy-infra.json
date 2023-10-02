@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.21.1.54444",
-      "templateHash": "18368073506094591502"
+      "templateHash": "12182103941367612365"
     }
   },
   "parameters": {
@@ -12933,6 +12933,171 @@
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('resourceGroupName')), 'Microsoft.Resources/deployments', take(format('{0}-app', variables('deploymentName')), 58))]",
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('resourceGroupName')), 'Microsoft.Resources/deployments', take(format('{0}-law', variables('deploymentName')), 58))]",
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('resourceGroupName')), 'Microsoft.Resources/deployments', take(format('{0}-pls', variables('deploymentName')), 58))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "[take(format('{0}-apimgw', variables('deploymentName')), 58)]",
+      "resourceGroup": "[variables('resourceGroupName')]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "apiName": {
+            "value": "test"
+          },
+          "apiServicemName": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('resourceGroupName')), 'Microsoft.Resources/deployments', take(format('{0}-apim', variables('deploymentName')), 58)), '2022-09-01').outputs.name.value]"
+          },
+          "gatewayName": {
+            "value": "gwapim"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.21.1.54444",
+              "templateHash": "1991023031159795609"
+            }
+          },
+          "parameters": {
+            "apiServicemName": {
+              "type": "string"
+            },
+            "apiName": {
+              "type": "string"
+            },
+            "gatewayName": {
+              "type": "string"
+            },
+            "enableAppInsights": {
+              "type": "bool",
+              "defaultValue": false
+            },
+            "appInsightsKey": {
+              "type": "string",
+              "defaultValue": ""
+            },
+            "appInsightsId": {
+              "type": "string",
+              "defaultValue": ""
+            }
+          },
+          "variables": {
+            "apiFullName": "[format('{0}API', parameters('apiName'))]"
+          },
+          "resources": [
+            {
+              "type": "Microsoft.ApiManagement/service/gateways",
+              "apiVersion": "2021-08-01",
+              "name": "[format('{0}/{1}', parameters('apiServicemName'), parameters('gatewayName'))]",
+              "properties": {
+                "description": "APIM on Azure Container Apps",
+                "locationData": {
+                  "name": "[format('{0}-on-aca', parameters('gatewayName'))]",
+                  "countryOrRegion": "Cloud"
+                }
+              }
+            },
+            {
+              "type": "Microsoft.ApiManagement/service/apis",
+              "apiVersion": "2021-08-01",
+              "name": "[format('{0}/{1}', parameters('apiServicemName'), variables('apiFullName'))]",
+              "properties": {
+                "path": "[format('/{0}', parameters('apiName'))]",
+                "apiType": "http",
+                "displayName": "[format('{0} API', parameters('apiName'))]",
+                "subscriptionRequired": true,
+                "subscriptionKeyParameterNames": {
+                  "header": "apiKey",
+                  "query": "apiKey"
+                },
+                "protocols": [
+                  "http",
+                  "https"
+                ]
+              }
+            },
+            {
+              "type": "Microsoft.ApiManagement/service/gateways/apis",
+              "apiVersion": "2021-08-01",
+              "name": "[format('{0}/{1}/{2}', parameters('apiServicemName'), parameters('gatewayName'), variables('apiFullName'))]",
+              "properties": {},
+              "dependsOn": [
+                "[resourceId('Microsoft.ApiManagement/service/apis', parameters('apiServicemName'), variables('apiFullName'))]",
+                "[resourceId('Microsoft.ApiManagement/service/gateways', parameters('apiServicemName'), parameters('gatewayName'))]"
+              ]
+            },
+            {
+              "type": "Microsoft.ApiManagement/service/apis/policies",
+              "apiVersion": "2021-08-01",
+              "name": "[format('{0}/{1}/{2}', parameters('apiServicemName'), variables('apiFullName'), 'policy')]",
+              "properties": {
+                "value": "<policies><inbound><base /><rate-limit-by-key calls=\"60\" renewal-period=\"60\" counter-key=\"@(String.Concat(\"success_\", context.Request.IpAddress))\" increment-condition=\"@(context.Response.StatusCode >= 200 && context.Response.StatusCode < 300)\" /><rate-limit-by-key calls=\"20\" renewal-period=\"60\" counter-key=\"@(String.Concat(\"fail_\", context.Request.IpAddress))\" increment-condition=\"@(context.Response.StatusCode >= 400)\" /></inbound><backend><base /></backend><outbound><base /></outbound><on-error><base /></on-error></policies>",
+                "format": "rawxml"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.ApiManagement/service/apis', parameters('apiServicemName'), variables('apiFullName'))]"
+              ]
+            },
+            {
+              "condition": "[parameters('enableAppInsights')]",
+              "type": "Microsoft.ApiManagement/service/namedValues",
+              "apiVersion": "2022-08-01",
+              "name": "[format('{0}/{1}', parameters('apiServicemName'), 'appinsights-key')]",
+              "properties": {
+                "tags": [],
+                "secret": true,
+                "displayName": "appinsights-key",
+                "value": "[parameters('appInsightsKey')]"
+              }
+            },
+            {
+              "condition": "[parameters('enableAppInsights')]",
+              "type": "Microsoft.ApiManagement/service/loggers",
+              "apiVersion": "2022-08-01",
+              "name": "[format('{0}/{1}', parameters('apiServicemName'), 'applicationinsights')]",
+              "properties": {
+                "loggerType": "applicationInsights",
+                "description": "Application Insights instance dedicated to APIM logging",
+                "resourceId": "[parameters('appInsightsId')]",
+                "credentials": {
+                  "instrumentationKey": "{{ appinsights-key }}"
+                }
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.ApiManagement/service/namedValues', parameters('apiServicemName'), 'appinsights-key')]"
+              ]
+            },
+            {
+              "condition": "[parameters('enableAppInsights')]",
+              "type": "Microsoft.ApiManagement/service/apis/diagnostics",
+              "apiVersion": "2022-08-01",
+              "name": "[format('{0}/{1}/{2}', parameters('apiServicemName'), variables('apiFullName'), 'applicationinsights')]",
+              "properties": {
+                "alwaysLog": "allErrors",
+                "loggerId": "[resourceId('Microsoft.ApiManagement/service/loggers', parameters('apiServicemName'), 'applicationinsights')]",
+                "logClientIp": true,
+                "httpCorrelationProtocol": "W3C",
+                "verbosity": "information",
+                "operationNameFormat": "Url"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.ApiManagement/service/apis', parameters('apiServicemName'), variables('apiFullName'))]",
+                "[resourceId('Microsoft.ApiManagement/service/loggers', parameters('apiServicemName'), 'applicationinsights')]"
+              ]
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('resourceGroupName')), 'Microsoft.Resources/deployments', take(format('{0}-apim', variables('deploymentName')), 58))]"
       ]
     }
   ],
