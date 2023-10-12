@@ -25,11 +25,12 @@ var acaEnvironmentName = 'env-${projectName}'
 var openAIName = 'ai-${projectName}'
 var apimName = 'apim-${projectName}'
 var aciName  = 'aci-${projectName}'
-var infrastructureResourceGroupName = '${resourceGroupName}_ME'
+var infrastructureResourceGroupName = 'ME_${resourceGroupName}'
 var privateLinkServiceName = 'pls-${projectName}'
 var pepName = 'pe-${acaEnvironmentName}'
 var loadBalancerName = 'kubernetes-internal'
 var frontDoorName = 'afd${projectName}'
+var msiName = 'msi${projectName}'
 
 // ---------------------------------------------------------
 // Resource Group
@@ -74,6 +75,16 @@ module modApplicationInsights 'CARML/insights/component/main.bicep' = {
   dependsOn: [
     modLogAnalytics
   ]
+}
+
+module modManagedIdentity 'modules/identities.bicep' = {
+  name: take('${deploymentName}-msi', 58)
+  scope : resourceGroup(resourceGroupName)
+  params: {
+    name: msiName
+    location:location
+    tags:tags
+  }
 }
 
 // ---------------------------------------------------------
@@ -173,6 +184,33 @@ module apimDns 'modules/privatednsapim.bicep' = {
   ]  
 }
 
+module apimDns2 'modules/privatednsapim.bicep' = {
+  name: take('${deploymentName}-apimdns2', 58)
+  scope : resourceGroup(resourceGroupName)
+  params: {
+    ipv4Address: modApim.outputs.privateIPs[0]
+    vnetId: modNetworking.outputs.virtualNetworkId
+    domain: 'configuration.azure-api.net'
+    apimServiceName: modApim.outputs.name
+  }
+  dependsOn: [
+    modApim
+  ]  
+}
+
+module apimDns3 'modules/privatednsapim.bicep' = {
+  name: take('${deploymentName}-apimdns3', 58)
+  scope : resourceGroup(resourceGroupName)
+  params: {
+    ipv4Address: modApim.outputs.privateIPs[0]
+    vnetId: modNetworking.outputs.virtualNetworkId
+    domain: 'management.azure-api.net'
+    apimServiceName: modApim.outputs.name
+  }
+  dependsOn: [
+    modApim
+  ]  
+}
 
 // ---------------------------------------------------------
 // Private link for Frontdoor (used also for internal traffic to ACA)
@@ -355,13 +393,15 @@ module frontDoor 'modules/frontdoor.bicep' = {
 // APIM self hosted gateway
 // ---------------------------------------------------------
 
+var gwName = 'gwapim'
+
 module createApimGateway 'modules/app-gateway-create.bicep' = {
   name: take('${deploymentName}-apimgw', 58)
   scope : resourceGroup(resourceGroupName)
   params: {
     apiName: 'test'
     apiServicemName: modApim.outputs.name
-    gatewayName: 'gwapim'
+    gatewayName: gwName
     enableAppInsights: true
     appInsightsResourceId: modApplicationInsights.outputs.resourceId
     appInsightsKey: modApplicationInsights.outputs.instrumentationKey
@@ -371,11 +411,39 @@ module createApimGateway 'modules/app-gateway-create.bicep' = {
   ]
 }
 
-// Get APIM token
+module modDeploymentScript 'modules/deployment-script.bicep' = {
+  name: take('${deploymentName}-script', 58)
+  scope : resourceGroup(resourceGroupName)
+  params: {
+    managedIdentityName: 'msiholafay'
+    location: location
+    tags: tags
+    expiryDate: '2023-10-21T22:00:00Z'
+    gwName: gwName
+    apimName: modApim.outputs.name
+    rgName: modResourceGroup.outputs.name
+    sid: subscription().subscriptionId
+  }
+  dependsOn: [ 
+    modApim
+  ]
+}
 
-// DEPLOYMENT=$(az deployment group create -g $RESOURCE_GROUP \
-//   -f ./bicep/aca-apim-ingress.bicep \
-//   -p apimName=$APIM_NAME projectCode=$PROJECT environmentId=$CONTAINERAPPS_ENVIRONMENTID gatewayToken="$GW_TOKEN" gatewayTag="$GATEWAY_TAG")
+module modGatewayOnAca 'modules/app-gateway-host.bicep' = {
+  name: take('${deploymentName}-acagw', 58)
+  scope : resourceGroup(resourceGroupName)
+  params: {
+    apimName: modApim.outputs.name
+    location: location
+    projectCode: projectName
+    environmentId: modAcaEnvironment.outputs.resourceId
+    gatewayToken: modDeploymentScript.outputs.apimToken
+  }
+  dependsOn: [ 
+    modApim
+    modAcaEnvironment
+  ]
+}
 
 output rgName string = modResourceGroup.outputs.name
 output plsName string = modPrivateLinkService.outputs.name

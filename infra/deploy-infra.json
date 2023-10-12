@@ -4,8 +4,8 @@
   "metadata": {
     "_generator": {
       "name": "bicep",
-      "version": "0.21.1.54444",
-      "templateHash": "6769636758880300178"
+      "version": "0.22.6.54827",
+      "templateHash": "16889804527284316543"
     }
   },
   "parameters": {
@@ -48,14 +48,16 @@
     "openAIName": "[format('ai-{0}', variables('projectName'))]",
     "apimName": "[format('apim-{0}', variables('projectName'))]",
     "aciName": "[format('aci-{0}', variables('projectName'))]",
-    "infrastructureResourceGroupName": "[format('{0}_ME', variables('resourceGroupName'))]",
+    "infrastructureResourceGroupName": "[format('ME_{0}', variables('resourceGroupName'))]",
     "privateLinkServiceName": "[format('pls-{0}', variables('projectName'))]",
     "pepName": "[format('pe-{0}', variables('acaEnvironmentName'))]",
     "loadBalancerName": "kubernetes-internal",
     "frontDoorName": "[format('afd{0}', variables('projectName'))]",
+    "msiName": "[format('msi{0}', variables('projectName'))]",
     "chatGptDeploymentName": "chat",
     "chatGptModelName": "gpt-35-turbo",
-    "chatGptModelVersion": "0301"
+    "chatGptModelVersion": "0301",
+    "gwName": "gwapim"
   },
   "resources": [
     {
@@ -85,8 +87,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.21.1.54444",
-              "templateHash": "3729995632350323768"
+              "version": "0.22.6.54827",
+              "templateHash": "698589074683460032"
             },
             "name": "Resource Groups",
             "description": "This module deploys a Resource Group.",
@@ -197,8 +199,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.21.1.54444",
-                      "templateHash": "10420976827552614779"
+                      "version": "0.22.6.54827",
+                      "templateHash": "8961143332409950444"
                     },
                     "name": "Authorization Locks (Resource Group scope)",
                     "description": "This module deploys an Authorization Lock at a Resource Group scope.",
@@ -330,8 +332,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.21.1.54444",
-                      "templateHash": "1146156557420886689"
+                      "version": "0.22.6.54827",
+                      "templateHash": "9238529270860750175"
                     }
                   },
                   "parameters": {
@@ -683,8 +685,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.21.1.54444",
-              "templateHash": "10794410731370898440"
+              "version": "0.22.6.54827",
+              "templateHash": "13390587976888913833"
             },
             "name": "Log Analytics Workspaces",
             "description": "This module deploys a Log Analytics Workspace.",
@@ -1078,8 +1080,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.21.1.54444",
-                      "templateHash": "6875862134545079569"
+                      "version": "0.22.6.54827",
+                      "templateHash": "6643427484780531502"
                     },
                     "name": "Log Analytics Workspace Storage Insight Configs",
                     "description": "This module deploys a Log Analytics Workspace Storage Insight Config.",
@@ -1225,8 +1227,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.21.1.54444",
-                      "templateHash": "7090165993767697446"
+                      "version": "0.22.6.54827",
+                      "templateHash": "15022791045507209174"
                     },
                     "name": "Log Analytics Workspace Linked Services",
                     "description": "This module deploys a Log Analytics Workspace Linked Service.",
@@ -1362,8 +1364,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.21.1.54444",
-                      "templateHash": "4972790707212258352"
+                      "version": "0.22.6.54827",
+                      "templateHash": "2117697022066188694"
                     },
                     "name": "Log Analytics Workspace Linked Storage Accounts",
                     "description": "This module deploys a Log Analytics Workspace Linked Storage Account.",
@@ -1500,8 +1502,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.21.1.54444",
-                      "templateHash": "8574189144245494701"
+                      "version": "0.22.6.54827",
+                      "templateHash": "12667331360871593591"
                     },
                     "name": "Log Analytics Workspace Saved Searches",
                     "description": "This module deploys a Log Analytics Workspace Saved Search.",
@@ -1675,8 +1677,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.21.1.54444",
-                      "templateHash": "13008977267947771049"
+                      "version": "0.22.6.54827",
+                      "templateHash": "7753879701724594327"
                     },
                     "name": "Log Analytics Workspace Data Exports",
                     "description": "This module deploys a Log Analytics Workspace Data Export.",
@@ -1825,8 +1827,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.21.1.54444",
-                      "templateHash": "17869715776960241714"
+                      "version": "0.22.6.54827",
+                      "templateHash": "7994060758159745935"
                     },
                     "name": "Log Analytics Workspace Datasources",
                     "description": "This module deploys a Log Analytics Workspace Data Source.",
@@ -2055,8 +2057,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.21.1.54444",
-                      "templateHash": "13305914804653693951"
+                      "version": "0.22.6.54827",
+                      "templateHash": "9983426146462646968"
                     },
                     "name": "Log Analytics Workspace Tables",
                     "description": "This module deploys a Log Analytics Workspace Table.",
@@ -2227,8 +2229,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.21.1.54444",
-                      "templateHash": "9052763253522380709"
+                      "version": "0.22.6.54827",
+                      "templateHash": "2318608107759137473"
                     },
                     "name": "Operations Management Solutions",
                     "description": "This module deploys an Operations Management Solution.",
@@ -2381,8 +2383,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.21.1.54444",
-                      "templateHash": "3735355062180278453"
+                      "version": "0.22.6.54827",
+                      "templateHash": "17191832464911210338"
                     }
                   },
                   "parameters": {
@@ -2587,8 +2589,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.21.1.54444",
-              "templateHash": "17654702224690381000"
+              "version": "0.22.6.54827",
+              "templateHash": "10525905837638712461"
             },
             "name": "Application Insights",
             "description": "This component deploys an Application Insights instance.",
@@ -2879,8 +2881,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.21.1.54444",
-                      "templateHash": "13934424345752147710"
+                      "version": "0.22.6.54827",
+                      "templateHash": "11402620495113145502"
                     }
                   },
                   "parameters": {
@@ -3177,6 +3179,72 @@
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2022-09-01",
+      "name": "[take(format('{0}-msi', variables('deploymentName')), 58)]",
+      "resourceGroup": "[variables('resourceGroupName')]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "name": {
+            "value": "[variables('msiName')]"
+          },
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "tags": {
+            "value": "[parameters('tags')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.22.6.54827",
+              "templateHash": "10714676716566357672"
+            }
+          },
+          "parameters": {
+            "name": {
+              "type": "string"
+            },
+            "location": {
+              "type": "string",
+              "defaultValue": "[resourceGroup().location]"
+            },
+            "tags": {
+              "type": "object",
+              "defaultValue": {}
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
+              "apiVersion": "2023-01-31",
+              "name": "[parameters('name')]",
+              "location": "[parameters('location')]",
+              "tags": "[parameters('tags')]"
+            }
+          ],
+          "outputs": {
+            "miPrincipalId": {
+              "type": "string",
+              "value": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('name')), '2023-01-31').principalId]"
+            },
+            "miClientId": {
+              "type": "string",
+              "value": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('name')), '2023-01-31').clientId]"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
       "name": "[take(format('{0}-networking', variables('deploymentName')), 58)]",
       "resourceGroup": "[variables('resourceGroupName')]",
       "properties": {
@@ -3204,8 +3272,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.21.1.54444",
-              "templateHash": "10380544507241956819"
+              "version": "0.22.6.54827",
+              "templateHash": "6109303783102757834"
             }
           },
           "parameters": {
@@ -3864,8 +3932,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.21.1.54444",
-              "templateHash": "2692402207016557396"
+              "version": "0.22.6.54827",
+              "templateHash": "3348513206726382635"
             }
           },
           "parameters": {
@@ -4005,8 +4073,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.21.1.54444",
-              "templateHash": "10054417248605562888"
+              "version": "0.22.6.54827",
+              "templateHash": "7449129905947671585"
             },
             "name": "App ManagedEnvironments",
             "description": "This module deploys an App Managed Environment (also known as a Container App Environment).",
@@ -4255,8 +4323,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.21.1.54444",
-                      "templateHash": "10028072894056989627"
+                      "version": "0.22.6.54827",
+                      "templateHash": "18101859194273235473"
                     }
                   },
                   "parameters": {
@@ -4459,8 +4527,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.21.1.54444",
-              "templateHash": "14232835464852420699"
+              "version": "0.22.6.54827",
+              "templateHash": "3848617210454984965"
             },
             "name": "API Management Services",
             "description": "This module deploys an API Management Service.",
@@ -4956,8 +5024,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.21.1.54444",
-                      "templateHash": "13643970540915525806"
+                      "version": "0.22.6.54827",
+                      "templateHash": "17340528539230351720"
                     },
                     "name": "API Management Service APIs",
                     "description": "This module deploys an API Management Service API.",
@@ -5236,8 +5304,8 @@
                           "metadata": {
                             "_generator": {
                               "name": "bicep",
-                              "version": "0.21.1.54444",
-                              "templateHash": "6059606679416480431"
+                              "version": "0.22.6.54827",
+                              "templateHash": "14571499926134179860"
                             },
                             "name": "API Management Service APIs Policies",
                             "description": "This module deploys an API Management Service API Policy.",
@@ -5406,8 +5474,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.21.1.54444",
-                      "templateHash": "17009588020697963791"
+                      "version": "0.22.6.54827",
+                      "templateHash": "12233980723609740158"
                     },
                     "name": "API Management Service API Version Sets",
                     "description": "This module deploys an API Management Service API Version Set.",
@@ -5546,8 +5614,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.21.1.54444",
-                      "templateHash": "10093092890891107320"
+                      "version": "0.22.6.54827",
+                      "templateHash": "7988688467600216709"
                     },
                     "name": "API Management Service Authorization Servers",
                     "description": "This module deploys an API Management Service Authorization Server.",
@@ -5794,8 +5862,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.21.1.54444",
-                      "templateHash": "15587770490550622003"
+                      "version": "0.22.6.54827",
+                      "templateHash": "3713166604792624713"
                     },
                     "name": "API Management Service Backends",
                     "description": "This module deploys an API Management Service Backend.",
@@ -5988,8 +6056,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.21.1.54444",
-                      "templateHash": "12512964555569038583"
+                      "version": "0.22.6.54827",
+                      "templateHash": "4933923478377534151"
                     },
                     "name": "API Management Service Caches",
                     "description": "This module deploys an API Management Service Cache.",
@@ -6139,8 +6207,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.21.1.54444",
-                      "templateHash": "5821693072491820871"
+                      "version": "0.22.6.54827",
+                      "templateHash": "13822474427587974385"
                     },
                     "name": "API Management Service Identity Providers",
                     "description": "This module deploys an API Management Service Identity Provider.",
@@ -6355,8 +6423,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.21.1.54444",
-                      "templateHash": "3922343729155718081"
+                      "version": "0.22.6.54827",
+                      "templateHash": "3581707708141744852"
                     },
                     "name": "API Management Service Named Values",
                     "description": "This module deploys an API Management Service Named Value.",
@@ -6508,8 +6576,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.21.1.54444",
-                      "templateHash": "869969373482543080"
+                      "version": "0.22.6.54827",
+                      "templateHash": "1124223085084988655"
                     },
                     "name": "API Management Service Portal Settings",
                     "description": "This module deploys an API Management Service Portal Setting.",
@@ -6631,8 +6699,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.21.1.54444",
-                      "templateHash": "13858171935263007479"
+                      "version": "0.22.6.54827",
+                      "templateHash": "3650757020022888901"
                     },
                     "name": "API Management Service Policies",
                     "description": "This module deploys an API Management Service Policy.",
@@ -6771,8 +6839,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.21.1.54444",
-                      "templateHash": "6198741217819703348"
+                      "version": "0.22.6.54827",
+                      "templateHash": "2758822676627115160"
                     },
                     "name": "API Management Service Products",
                     "description": "This module deploys an API Management Service Product.",
@@ -6920,8 +6988,8 @@
                           "metadata": {
                             "_generator": {
                               "name": "bicep",
-                              "version": "0.21.1.54444",
-                              "templateHash": "4854177138271927700"
+                              "version": "0.22.6.54827",
+                              "templateHash": "16488730655399972556"
                             },
                             "name": "API Management Service Products APIs",
                             "description": "This module deploys an API Management Service Product API.",
@@ -7034,8 +7102,8 @@
                           "metadata": {
                             "_generator": {
                               "name": "bicep",
-                              "version": "0.21.1.54444",
-                              "templateHash": "8500094107587576986"
+                              "version": "0.22.6.54827",
+                              "templateHash": "14085709622188800883"
                             },
                             "name": "API Management Service Products Groups",
                             "description": "This module deploys an API Management Service Product Group.",
@@ -7200,8 +7268,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.21.1.54444",
-                      "templateHash": "5104726614398406453"
+                      "version": "0.22.6.54827",
+                      "templateHash": "10733141744485121232"
                     },
                     "name": "API Management Service Subscriptions",
                     "description": "This module deploys an API Management Service Subscription.",
@@ -7363,8 +7431,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.21.1.54444",
-                      "templateHash": "15706860856976307419"
+                      "version": "0.22.6.54827",
+                      "templateHash": "1194193235287598548"
                     }
                   },
                   "parameters": {
@@ -7571,8 +7639,196 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.21.1.54444",
-              "templateHash": "7396010966946791899"
+              "version": "0.22.6.54827",
+              "templateHash": "3061856352901323742"
+            }
+          },
+          "parameters": {
+            "ipv4Address": {
+              "type": "string"
+            },
+            "vnetId": {
+              "type": "string"
+            },
+            "domain": {
+              "type": "string"
+            },
+            "apimServiceName": {
+              "type": "string"
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Network/privateDnsZones",
+              "apiVersion": "2020-06-01",
+              "name": "[parameters('domain')]",
+              "location": "Global"
+            },
+            {
+              "type": "Microsoft.Network/privateDnsZones/A",
+              "apiVersion": "2020-06-01",
+              "name": "[format('{0}/{1}', parameters('domain'), parameters('apimServiceName'))]",
+              "properties": {
+                "aRecords": [
+                  {
+                    "ipv4Address": "[parameters('ipv4Address')]"
+                  }
+                ],
+                "ttl": 3600
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Network/privateDnsZones', parameters('domain'))]"
+              ]
+            },
+            {
+              "type": "Microsoft.Network/privateDnsZones/virtualNetworkLinks",
+              "apiVersion": "2018-09-01",
+              "name": "[format('{0}/{1}', parameters('domain'), format('{0}-vnet-link', parameters('domain')))]",
+              "location": "Global",
+              "properties": {
+                "registrationEnabled": false,
+                "virtualNetwork": {
+                  "id": "[parameters('vnetId')]"
+                }
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Network/privateDnsZones', parameters('domain'))]"
+              ]
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('resourceGroupName')), 'Microsoft.Resources/deployments', take(format('{0}-apim', variables('deploymentName')), 58))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('resourceGroupName')), 'Microsoft.Resources/deployments', take(format('{0}-networking', variables('deploymentName')), 58))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "[take(format('{0}-apimdns2', variables('deploymentName')), 58)]",
+      "resourceGroup": "[variables('resourceGroupName')]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "ipv4Address": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('resourceGroupName')), 'Microsoft.Resources/deployments', take(format('{0}-apim', variables('deploymentName')), 58)), '2022-09-01').outputs.privateIPs.value[0]]"
+          },
+          "vnetId": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('resourceGroupName')), 'Microsoft.Resources/deployments', take(format('{0}-networking', variables('deploymentName')), 58)), '2022-09-01').outputs.virtualNetworkId.value]"
+          },
+          "domain": {
+            "value": "configuration.azure-api.net"
+          },
+          "apimServiceName": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('resourceGroupName')), 'Microsoft.Resources/deployments', take(format('{0}-apim', variables('deploymentName')), 58)), '2022-09-01').outputs.name.value]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.22.6.54827",
+              "templateHash": "3061856352901323742"
+            }
+          },
+          "parameters": {
+            "ipv4Address": {
+              "type": "string"
+            },
+            "vnetId": {
+              "type": "string"
+            },
+            "domain": {
+              "type": "string"
+            },
+            "apimServiceName": {
+              "type": "string"
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Network/privateDnsZones",
+              "apiVersion": "2020-06-01",
+              "name": "[parameters('domain')]",
+              "location": "Global"
+            },
+            {
+              "type": "Microsoft.Network/privateDnsZones/A",
+              "apiVersion": "2020-06-01",
+              "name": "[format('{0}/{1}', parameters('domain'), parameters('apimServiceName'))]",
+              "properties": {
+                "aRecords": [
+                  {
+                    "ipv4Address": "[parameters('ipv4Address')]"
+                  }
+                ],
+                "ttl": 3600
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Network/privateDnsZones', parameters('domain'))]"
+              ]
+            },
+            {
+              "type": "Microsoft.Network/privateDnsZones/virtualNetworkLinks",
+              "apiVersion": "2018-09-01",
+              "name": "[format('{0}/{1}', parameters('domain'), format('{0}-vnet-link', parameters('domain')))]",
+              "location": "Global",
+              "properties": {
+                "registrationEnabled": false,
+                "virtualNetwork": {
+                  "id": "[parameters('vnetId')]"
+                }
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Network/privateDnsZones', parameters('domain'))]"
+              ]
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('resourceGroupName')), 'Microsoft.Resources/deployments', take(format('{0}-apim', variables('deploymentName')), 58))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('resourceGroupName')), 'Microsoft.Resources/deployments', take(format('{0}-networking', variables('deploymentName')), 58))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "[take(format('{0}-apimdns3', variables('deploymentName')), 58)]",
+      "resourceGroup": "[variables('resourceGroupName')]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "ipv4Address": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('resourceGroupName')), 'Microsoft.Resources/deployments', take(format('{0}-apim', variables('deploymentName')), 58)), '2022-09-01').outputs.privateIPs.value[0]]"
+          },
+          "vnetId": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('resourceGroupName')), 'Microsoft.Resources/deployments', take(format('{0}-networking', variables('deploymentName')), 58)), '2022-09-01').outputs.virtualNetworkId.value]"
+          },
+          "domain": {
+            "value": "management.azure-api.net"
+          },
+          "apimServiceName": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('resourceGroupName')), 'Microsoft.Resources/deployments', take(format('{0}-apim', variables('deploymentName')), 58)), '2022-09-01').outputs.name.value]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.22.6.54827",
+              "templateHash": "3061856352901323742"
             }
           },
           "parameters": {
@@ -7677,8 +7933,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.21.1.54444",
-              "templateHash": "7193171150498069890"
+              "version": "0.22.6.54827",
+              "templateHash": "17798350513678178989"
             }
           },
           "parameters": {
@@ -7832,8 +8088,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.21.1.54444",
-              "templateHash": "8978905029344253271"
+              "version": "0.22.6.54827",
+              "templateHash": "1966554911283320926"
             }
           },
           "parameters": {
@@ -7928,8 +8184,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.21.1.54444",
-              "templateHash": "16790569254979596829"
+              "version": "0.22.6.54827",
+              "templateHash": "821137662960892929"
             }
           },
           "parameters": {
@@ -8025,8 +8281,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.21.1.54444",
-                      "templateHash": "9367369514020118730"
+                      "version": "0.22.6.54827",
+                      "templateHash": "6208883246276815797"
                     },
                     "name": "Container Apps",
                     "description": "This module deploys a Container App.",
@@ -8392,8 +8648,8 @@
                           "metadata": {
                             "_generator": {
                               "name": "bicep",
-                              "version": "0.21.1.54444",
-                              "templateHash": "9188415638960634445"
+                              "version": "0.22.6.54827",
+                              "templateHash": "6133741258710054291"
                             }
                           },
                           "parameters": {
@@ -8594,8 +8850,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.21.1.54444",
-              "templateHash": "13683700730440109473"
+              "version": "0.22.6.54827",
+              "templateHash": "7094231343264488816"
             },
             "name": "Private DNS Zones",
             "description": "This module deploys a Private DNS zone.",
@@ -8785,8 +9041,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.21.1.54444",
-                      "templateHash": "3023625235674916080"
+                      "version": "0.22.6.54827",
+                      "templateHash": "3286674755199812485"
                     },
                     "name": "Private DNS Zone A record",
                     "description": "This module deploys a Private DNS Zone A record.",
@@ -8900,8 +9156,8 @@
                           "metadata": {
                             "_generator": {
                               "name": "bicep",
-                              "version": "0.21.1.54444",
-                              "templateHash": "3091185834162670777"
+                              "version": "0.22.6.54827",
+                              "templateHash": "13885309482367640092"
                             }
                           },
                           "parameters": {
@@ -9107,8 +9363,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.21.1.54444",
-                      "templateHash": "9619664849560898729"
+                      "version": "0.22.6.54827",
+                      "templateHash": "17200265918515224034"
                     },
                     "name": "Private DNS Zone AAAA record",
                     "description": "This module deploys a Private DNS Zone AAAA record.",
@@ -9222,8 +9478,8 @@
                           "metadata": {
                             "_generator": {
                               "name": "bicep",
-                              "version": "0.21.1.54444",
-                              "templateHash": "16612032211561905990"
+                              "version": "0.22.6.54827",
+                              "templateHash": "370590810970469037"
                             }
                           },
                           "parameters": {
@@ -9429,8 +9685,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.21.1.54444",
-                      "templateHash": "18350416636780213220"
+                      "version": "0.22.6.54827",
+                      "templateHash": "1218346372201244802"
                     },
                     "name": "Private DNS Zone CNAME record",
                     "description": "This module deploys a Private DNS Zone CNAME record.",
@@ -9544,8 +9800,8 @@
                           "metadata": {
                             "_generator": {
                               "name": "bicep",
-                              "version": "0.21.1.54444",
-                              "templateHash": "12449188823441255969"
+                              "version": "0.22.6.54827",
+                              "templateHash": "3701509590842402185"
                             }
                           },
                           "parameters": {
@@ -9757,8 +10013,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.21.1.54444",
-                      "templateHash": "5407325770336305290"
+                      "version": "0.22.6.54827",
+                      "templateHash": "498719698216860438"
                     },
                     "name": "Private DNS Zone MX record",
                     "description": "This module deploys a Private DNS Zone MX record.",
@@ -9872,8 +10128,8 @@
                           "metadata": {
                             "_generator": {
                               "name": "bicep",
-                              "version": "0.21.1.54444",
-                              "templateHash": "5166139968688256157"
+                              "version": "0.22.6.54827",
+                              "templateHash": "3875667684091614842"
                             }
                           },
                           "parameters": {
@@ -10079,8 +10335,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.21.1.54444",
-                      "templateHash": "7429124351513910459"
+                      "version": "0.22.6.54827",
+                      "templateHash": "15278019758073479253"
                     },
                     "name": "Private DNS Zone PTR record",
                     "description": "This module deploys a Private DNS Zone PTR record.",
@@ -10194,8 +10450,8 @@
                           "metadata": {
                             "_generator": {
                               "name": "bicep",
-                              "version": "0.21.1.54444",
-                              "templateHash": "9774124555582341628"
+                              "version": "0.22.6.54827",
+                              "templateHash": "1115653551360161833"
                             }
                           },
                           "parameters": {
@@ -10401,8 +10657,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.21.1.54444",
-                      "templateHash": "6237133824894088471"
+                      "version": "0.22.6.54827",
+                      "templateHash": "2312801328936888366"
                     },
                     "name": "Private DNS Zone SOA record",
                     "description": "This module deploys a Private DNS Zone SOA record.",
@@ -10516,8 +10772,8 @@
                           "metadata": {
                             "_generator": {
                               "name": "bicep",
-                              "version": "0.21.1.54444",
-                              "templateHash": "13019341765980531210"
+                              "version": "0.22.6.54827",
+                              "templateHash": "7407904296801266090"
                             }
                           },
                           "parameters": {
@@ -10723,8 +10979,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.21.1.54444",
-                      "templateHash": "8022373880556162081"
+                      "version": "0.22.6.54827",
+                      "templateHash": "5952665052269893806"
                     },
                     "name": "Private DNS Zone SRV record",
                     "description": "This module deploys a Private DNS Zone SRV record.",
@@ -10838,8 +11094,8 @@
                           "metadata": {
                             "_generator": {
                               "name": "bicep",
-                              "version": "0.21.1.54444",
-                              "templateHash": "18406157225832506146"
+                              "version": "0.22.6.54827",
+                              "templateHash": "7603100820795358011"
                             }
                           },
                           "parameters": {
@@ -11045,8 +11301,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.21.1.54444",
-                      "templateHash": "9882979825935476673"
+                      "version": "0.22.6.54827",
+                      "templateHash": "1124215030878784014"
                     },
                     "name": "Private DNS Zone TXT record",
                     "description": "This module deploys a Private DNS Zone TXT record.",
@@ -11160,8 +11416,8 @@
                           "metadata": {
                             "_generator": {
                               "name": "bicep",
-                              "version": "0.21.1.54444",
-                              "templateHash": "3370209117297708556"
+                              "version": "0.22.6.54827",
+                              "templateHash": "16791864516622438253"
                             }
                           },
                           "parameters": {
@@ -11367,8 +11623,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.21.1.54444",
-                      "templateHash": "2352064432983921161"
+                      "version": "0.22.6.54827",
+                      "templateHash": "12342244725180262876"
                     },
                     "name": "Private DNS Zone Virtual Network Link",
                     "description": "This module deploys a Private DNS Zone Virtual Network Link.",
@@ -11522,8 +11778,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.21.1.54444",
-                      "templateHash": "13504974986686820957"
+                      "version": "0.22.6.54827",
+                      "templateHash": "2044377995221762227"
                     }
                   },
                   "parameters": {
@@ -11772,8 +12028,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.21.1.54444",
-              "templateHash": "3673789694277775437"
+              "version": "0.22.6.54827",
+              "templateHash": "7782342472685066768"
             },
             "name": "Cognitive Services",
             "description": "This module deploys a Cognitive Service.",
@@ -12247,8 +12503,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.21.1.54444",
-                      "templateHash": "14580007913383558904"
+                      "version": "0.22.6.54827",
+                      "templateHash": "2884140170473394983"
                     },
                     "name": "Private Endpoints",
                     "description": "This module deploys a Private Endpoint.",
@@ -12447,8 +12703,8 @@
                           "metadata": {
                             "_generator": {
                               "name": "bicep",
-                              "version": "0.21.1.54444",
-                              "templateHash": "2469208411936339153"
+                              "version": "0.22.6.54827",
+                              "templateHash": "5610247137574346230"
                             },
                             "name": "Private Endpoint Private DNS Zone Groups",
                             "description": "This module deploys a Private Endpoint Private DNS Zone Group.",
@@ -12585,8 +12841,8 @@
                           "metadata": {
                             "_generator": {
                               "name": "bicep",
-                              "version": "0.21.1.54444",
-                              "templateHash": "13032708393704093995"
+                              "version": "0.22.6.54827",
+                              "templateHash": "14351187799927334028"
                             }
                           },
                           "parameters": {
@@ -12799,8 +13055,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.21.1.54444",
-                      "templateHash": "8402203115964616978"
+                      "version": "0.22.6.54827",
+                      "templateHash": "2121072685211673304"
                     }
                   },
                   "parameters": {
@@ -13041,8 +13297,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.21.1.54444",
-              "templateHash": "5977050062462249393"
+              "version": "0.22.6.54827",
+              "templateHash": "4493643383612165797"
             }
           },
           "parameters": {
@@ -13393,8 +13649,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.21.1.54444",
-                      "templateHash": "14407982393127383492"
+                      "version": "0.22.6.54827",
+                      "templateHash": "8050308700456466551"
                     }
                   },
                   "parameters": {
@@ -13574,7 +13830,7 @@
             "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('resourceGroupName')), 'Microsoft.Resources/deployments', take(format('{0}-apim', variables('deploymentName')), 58)), '2022-09-01').outputs.name.value]"
           },
           "gatewayName": {
-            "value": "gwapim"
+            "value": "[variables('gwName')]"
           },
           "enableAppInsights": {
             "value": true
@@ -13592,8 +13848,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.21.1.54444",
-              "templateHash": "3213919616383573277"
+              "version": "0.22.6.54827",
+              "templateHash": "16646498981249805057"
             }
           },
           "parameters": {
@@ -13729,6 +13985,313 @@
       "dependsOn": [
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('resourceGroupName')), 'Microsoft.Resources/deployments', take(format('{0}-apim', variables('deploymentName')), 58))]",
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('resourceGroupName')), 'Microsoft.Resources/deployments', take(format('{0}-ains', variables('deploymentName')), 58))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "[take(format('{0}-script', variables('deploymentName')), 58)]",
+      "resourceGroup": "[variables('resourceGroupName')]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "managedIdentityName": {
+            "value": "msiholafay"
+          },
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "tags": {
+            "value": "[parameters('tags')]"
+          },
+          "expiryDate": {
+            "value": "2023-10-21T22:00:00Z"
+          },
+          "gwName": {
+            "value": "[variables('gwName')]"
+          },
+          "apimName": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('resourceGroupName')), 'Microsoft.Resources/deployments', take(format('{0}-apim', variables('deploymentName')), 58)), '2022-09-01').outputs.name.value]"
+          },
+          "rgName": {
+            "value": "[reference(subscriptionResourceId('Microsoft.Resources/deployments', take(format('{0}-rg', variables('deploymentName')), 58)), '2022-09-01').outputs.name.value]"
+          },
+          "sid": {
+            "value": "[subscription().subscriptionId]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.22.6.54827",
+              "templateHash": "16404963937592460884"
+            }
+          },
+          "parameters": {
+            "managedIdentityName": {
+              "type": "string",
+              "metadata": {
+                "description": "Required. The name of the Managed Identity to create."
+              }
+            },
+            "location": {
+              "type": "string"
+            },
+            "expiryDate": {
+              "type": "string",
+              "defaultValue": "2023-10-14T22:00:00Z"
+            },
+            "gwName": {
+              "type": "string",
+              "defaultValue": "gwapim"
+            },
+            "apimName": {
+              "type": "string",
+              "defaultValue": "apim-holafay"
+            },
+            "rgName": {
+              "type": "string",
+              "defaultValue": "rg-holafay"
+            },
+            "sid": {
+              "type": "string",
+              "defaultValue": "c1537527-c126-428d-8f72-1ac9f2c63c1f"
+            },
+            "tags": {
+              "type": "object",
+              "defaultValue": {},
+              "metadata": {
+                "description": "Optional: Tags"
+              }
+            },
+            "utcValue": {
+              "type": "string",
+              "defaultValue": "[utcNow()]",
+              "metadata": {
+                "description": "Optional: Current Time."
+              }
+            }
+          },
+          "variables": {
+            "$fxv#0": "GW_URI=\"https://management.azure.com/subscriptions/${sid}/resourceGroups/${rgName}/providers/Microsoft.ApiManagement/service/${apimName}/gateways/${gwName}/generateToken/?api-version=2022-08-01\"\nGW_TOKEN=$(az rest --method POST --uri \"${GW_URI}\" --body \"{ \\\"expiry\\\": \\\"${expiryDate}\\\", \\\"keyType\\\": \\\"primary\\\" }\" | jq .value | tr -d \"\\\"\")\nGW_TOKEN=\"GatewayKey ${GW_TOKEN}\"\necho $(jq --null-input --arg myToken \"$GW_TOKEN\" '{\"ApimToken\": $myToken }') > $AZ_SCRIPTS_OUTPUT_PATH"
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Resources/deploymentScripts",
+              "apiVersion": "2020-10-01",
+              "name": "deploymentScript",
+              "location": "[parameters('location')]",
+              "kind": "AzureCLI",
+              "identity": {
+                "type": "UserAssigned",
+                "userAssignedIdentities": {
+                  "[format('{0}', resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('managedIdentityName')))]": {}
+                }
+              },
+              "properties": {
+                "forceUpdateTag": "[parameters('utcValue')]",
+                "azCliVersion": "2.47.0",
+                "timeout": "PT10M",
+                "cleanupPreference": "Always",
+                "retentionInterval": "P1D",
+                "environmentVariables": [
+                  {
+                    "name": "expiryDate",
+                    "value": "[parameters('expiryDate')]"
+                  },
+                  {
+                    "name": "gwName",
+                    "value": "[parameters('gwName')]"
+                  },
+                  {
+                    "name": "apimName",
+                    "value": "[parameters('apimName')]"
+                  },
+                  {
+                    "name": "rgName",
+                    "value": "[parameters('rgName')]"
+                  },
+                  {
+                    "name": "sid",
+                    "value": "[parameters('sid')]"
+                  }
+                ],
+                "scriptContent": "[variables('$fxv#0')]"
+              },
+              "tags": "[parameters('tags')]"
+            }
+          ],
+          "outputs": {
+            "exists": {
+              "type": "bool",
+              "value": "[greater(length(reference(resourceId('Microsoft.Resources/deploymentScripts', 'deploymentScript'), '2020-10-01').outputs.ApimToken), 0)]"
+            },
+            "apimToken": {
+              "type": "string",
+              "value": "[reference(resourceId('Microsoft.Resources/deploymentScripts', 'deploymentScript'), '2020-10-01').outputs.ApimToken]"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('resourceGroupName')), 'Microsoft.Resources/deployments', take(format('{0}-apim', variables('deploymentName')), 58))]",
+        "[subscriptionResourceId('Microsoft.Resources/deployments', take(format('{0}-rg', variables('deploymentName')), 58))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "[take(format('{0}-acagw', variables('deploymentName')), 58)]",
+      "resourceGroup": "[variables('resourceGroupName')]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "apimName": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('resourceGroupName')), 'Microsoft.Resources/deployments', take(format('{0}-apim', variables('deploymentName')), 58)), '2022-09-01').outputs.name.value]"
+          },
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "projectCode": {
+            "value": "[variables('projectName')]"
+          },
+          "environmentId": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('resourceGroupName')), 'Microsoft.Resources/deployments', take(format('{0}-acaenv', variables('deploymentName')), 58)), '2022-09-01').outputs.resourceId.value]"
+          },
+          "gatewayToken": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('resourceGroupName')), 'Microsoft.Resources/deployments', take(format('{0}-script', variables('deploymentName')), 58)), '2022-09-01').outputs.apimToken.value]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.22.6.54827",
+              "templateHash": "3054904654581732283"
+            }
+          },
+          "parameters": {
+            "apimName": {
+              "type": "string"
+            },
+            "projectCode": {
+              "type": "string"
+            },
+            "isExternalIngress": {
+              "type": "bool",
+              "defaultValue": true
+            },
+            "location": {
+              "type": "string",
+              "defaultValue": "[resourceGroup().location]"
+            },
+            "environmentId": {
+              "type": "string"
+            },
+            "gatewayToken": {
+              "type": "securestring"
+            },
+            "gatewayTag": {
+              "type": "string",
+              "defaultValue": "latest"
+            },
+            "secrets": {
+              "type": "array",
+              "defaultValue": [
+                {
+                  "name": "apim-gateway-on-aca-token",
+                  "value": "[parameters('gatewayToken')]"
+                }
+              ]
+            }
+          },
+          "variables": {
+            "env": [
+              {
+                "name": "config.service.endpoint",
+                "value": "[format('{0}.configuration.azure-api.net', parameters('apimName'))]"
+              },
+              {
+                "name": "config.service.auth",
+                "secretRef": "[parameters('secrets')[0].name]"
+              }
+            ]
+          },
+          "resources": [
+            {
+              "type": "Microsoft.App/containerApps",
+              "apiVersion": "2022-10-01",
+              "name": "[format('{0}-ingress', parameters('projectCode'))]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "environmentId": "[parameters('environmentId')]",
+                "configuration": {
+                  "activeRevisionsMode": "Single",
+                  "ingress": {
+                    "allowInsecure": false,
+                    "external": "[parameters('isExternalIngress')]",
+                    "targetPort": 8080,
+                    "transport": "auto"
+                  },
+                  "secrets": "[parameters('secrets')]"
+                },
+                "template": {
+                  "containers": [
+                    {
+                      "image": "[format('mcr.microsoft.com/azure-api-management/gateway:{0}', parameters('gatewayTag'))]",
+                      "name": "[format('{0}-ingress', parameters('projectCode'))]",
+                      "env": "[variables('env')]",
+                      "resources": {
+                        "cpu": "[json('0.5')]",
+                        "memory": "1Gi"
+                      }
+                    }
+                  ],
+                  "scale": {
+                    "minReplicas": 1,
+                    "maxReplicas": 4,
+                    "rules": [
+                      {
+                        "name": "http",
+                        "http": {
+                          "metadata": {
+                            "concurrentRequests": "1000"
+                          }
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          ],
+          "outputs": {
+            "fqdn": {
+              "type": "string",
+              "value": "[reference(resourceId('Microsoft.App/containerApps', format('{0}-ingress', parameters('projectCode'))), '2022-10-01').configuration.ingress.fqdn]"
+            },
+            "ingressName": {
+              "type": "string",
+              "value": "[format('{0}-ingress', parameters('projectCode'))]"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('resourceGroupName')), 'Microsoft.Resources/deployments', take(format('{0}-acaenv', variables('deploymentName')), 58))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('resourceGroupName')), 'Microsoft.Resources/deployments', take(format('{0}-apim', variables('deploymentName')), 58))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('resourceGroupName')), 'Microsoft.Resources/deployments', take(format('{0}-script', variables('deploymentName')), 58))]"
       ]
     }
   ],
