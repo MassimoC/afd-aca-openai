@@ -1,8 +1,8 @@
 param id string
 param environmentId string
-param location string
-param tags object
 param replicas int = 1
+param location string = resourceGroup().location
+param tags object= {}
 
 var appName = 'app-${id}'
 

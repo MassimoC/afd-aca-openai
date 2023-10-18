@@ -352,3 +352,6 @@ output systemAssignedPrincipalId string = systemAssignedIdentity && contains(cog
 
 @description('The location the resource was deployed into.')
 output location string = cognitiveServices.location
+
+@description('Outputs should not contain secrets!!!!')
+output securityKey string = cognitiveServices.listKeys().key1

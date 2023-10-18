@@ -31,6 +31,11 @@ var pepName = 'pe-${acaEnvironmentName}'
 var loadBalancerName = 'kubernetes-internal'
 var frontDoorName = 'afd${projectName}'
 var msiName = 'msi${projectName}'
+var appChatName = 'chat-${projectName}'
+
+var chatGptDeploymentName = 'gpt${projectName}'
+var chatGptModelName = 'gpt-35-turbo'
+var chatGptModelVersion='0301'
 
 // ---------------------------------------------------------
 // Resource Group
@@ -252,7 +257,7 @@ module pdns 'modules/privatedns.bicep' = {
 }
 
 // ---------------------------------------------------------
-// Container Apps Application
+// Container Apps Application (podinfo)
 // ---------------------------------------------------------
 module modApp 'modules/app.bicep' = {
   name: take('${deploymentName}-app', 58)
@@ -265,10 +270,6 @@ module modApp 'modules/app.bicep' = {
     environmentId:modAcaEnvironment.outputs.resourceId
   }
 }
-
-var chatGptDeploymentName = 'chat'
-var chatGptModelName = 'gpt-35-turbo'
-var chatGptModelVersion='0301'
 
 // ---------------------------------------------------------
 // Private DNS Zone for OpenAI
@@ -338,6 +339,30 @@ module modOpenAI  'CARML/cognitive-services/account/main.bicep' = {
   ]  
 }
 
+
+// ---------------------------------------------------------
+// Container Apps Application (chatbotui)
+// ---------------------------------------------------------
+
+var openAIHost = substring(modOpenAI.outputs.endpoint, 0, length(modOpenAI.outputs.endpoint)-1)
+
+module modAppChatbotUI 'modules/app-chatbotui.bicep' = {
+  name: take('${deploymentName}-chat', 58)
+  scope : resourceGroup(resourceGroupName)
+  params: {
+    appName: appChatName
+    replicas: 1
+    location:location
+    tags:tags
+    environmentId:modAcaEnvironment.outputs.resourceId
+    openAI_Key: modOpenAI.outputs.securityKey
+    openAI_Host: openAIHost
+    openAI_DeploymentId: chatGptDeploymentName
+    openAI_ModelName: chatGptModelName
+  }
+  dependsOn: [modOpenAI]
+}
+
 // ---------------------------------------------------------
 // Azure Frontdoor premium
 // ---------------------------------------------------------
@@ -348,6 +373,7 @@ var apimHostName = split(modApim.outputs.gatewayURL, '/')[2]
 // open api REST api do not expose a probe endpoint
 var openAIHostName = split(modOpenAI.outputs.endpoint, '/')[2]
 
+
 var origins  = [
   {
     domainprefix: 'lab1'
@@ -357,8 +383,8 @@ var origins  = [
   }
   {
     domainprefix: 'lab2'
-    originHostName: modApp.outputs.ingressFqdn
-    probePath: '/healthz'
+    originHostName: modAppChatbotUI.outputs.ingressFqdn
+    probePath: '/'
     linkToDefaultDomain:'Disabled'
   }  
   // {

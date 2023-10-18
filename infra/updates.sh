@@ -17,7 +17,7 @@ projectName='holatest'
 echo "${DBG}... Trigger INFRA deployment on $projectName"
 
 RESULT=$(az stack sub create --name $projectName \
-    --template-file dtest.bicep \
+    --template-file updates.bicep \
     --parameters project='holafay' \
     --location westeurope \
     --deny-settings-mode None --yes)

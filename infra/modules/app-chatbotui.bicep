@@ -1,10 +1,12 @@
-param id string
+param appName string
 param environmentId string
-param location string
-param tags object
+param openAI_Key string 
+param openAI_Host string
+param openAI_DeploymentId string
+param openAI_ModelName string
 param replicas int = 1
-
-var appName = 'app-${id}'
+param location string = resourceGroup().location
+param tags object= {}
 
 module app  '../CARML/app/container-app/main.bicep' = {
   name: take('${deployment().name}-${appName}', 64)
@@ -26,39 +28,35 @@ module app  '../CARML/app/container-app/main.bicep' = {
         env: [
           {
             name: 'OPENAI_API_KEY'
-            value: 'string'
+            value: openAI_Key
           }
           {
             name: 'OPENAI_API_HOST'
-            value: 'string'
+            value: openAI_Host
           }
           {
             name: 'OPENAI_API_TYPE'
-            value: 'string'
+            value: 'azure'
           }
           {
             name: 'OPENAI_API_VERSION'
-            value: 'string'
+            value: '2023-05-15'
           }
           {
             name: 'AZURE_DEPLOYMENT_ID'
-            value: 'string'
-          }
-          {
-            name: 'OPENAI_ORGANIZATION'
-            value: 'string'
+            value: openAI_DeploymentId
           }
           {
             name: 'DEFAULT_MODEL'
-            value: 'string'
+            value: openAI_ModelName
           }
           {
             name: 'NEXT_PUBLIC_DEFAULT_SYSTEM_PROMPT'
-            value: 'string'
+            value: 'You are ChatGPT, a large language model trained by OpenAI. Follow the user instructions carefully. Respond only about API related topics. Respond using plain text.'
           }
           {
             name: 'NEXT_PUBLIC_DEFAULT_TEMPERATURE'
-            value: 'string'
+            value: '1'
           }         
         ]
         probes: [
