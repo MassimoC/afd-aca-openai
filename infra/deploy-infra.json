@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.22.6.54827",
-      "templateHash": "1970674728139961698"
+      "templateHash": "7146774651651149375"
     }
   },
   "parameters": {
@@ -48,6 +48,7 @@
     "openAIName": "[format('ai-{0}', variables('projectName'))]",
     "apimName": "[format('apim-{0}', variables('projectName'))]",
     "aciName": "[format('aci-{0}', variables('projectName'))]",
+    "acrName": "[variables('projectName')]",
     "infrastructureResourceGroupName": "[format('ME_{0}', variables('resourceGroupName'))]",
     "privateLinkServiceName": "[format('pls-{0}', variables('projectName'))]",
     "pepName": "[format('pe-{0}', variables('acaEnvironmentName'))]",
@@ -3205,7 +3206,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.22.6.54827",
-              "templateHash": "10714676716566357672"
+              "templateHash": "14050957206902388504"
             }
           },
           "parameters": {
@@ -3231,6 +3232,10 @@
             }
           ],
           "outputs": {
+            "miResourceId": {
+              "type": "string",
+              "value": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('name'))]"
+            },
             "miPrincipalId": {
               "type": "string",
               "value": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('name')), '2023-01-31').principalId]"
@@ -3242,6 +3247,173 @@
           }
         }
       }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "[take(format('{0}-acr', variables('deploymentName')), 58)]",
+      "resourceGroup": "[variables('resourceGroupName')]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "name": {
+            "value": "[variables('acrName')]"
+          },
+          "adminUserEnabled": {
+            "value": true
+          },
+          "workspaceId": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('resourceGroupName')), 'Microsoft.Resources/deployments', take(format('{0}-law', variables('deploymentName')), 58)), '2022-09-01').outputs.resourceId.value]"
+          },
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "tags": {
+            "value": "[parameters('tags')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.22.6.54827",
+              "templateHash": "17126512067433833009"
+            }
+          },
+          "parameters": {
+            "name": {
+              "type": "string",
+              "defaultValue": "[format('acr{0}', uniqueString(resourceGroup().id))]",
+              "minLength": 5,
+              "maxLength": 50,
+              "metadata": {
+                "description": "Name of your Azure Container Registry"
+              }
+            },
+            "adminUserEnabled": {
+              "type": "bool",
+              "defaultValue": false,
+              "metadata": {
+                "description": "Enable admin user that have push / pull permission to the registry."
+              }
+            },
+            "sku": {
+              "type": "string",
+              "defaultValue": "Premium",
+              "allowedValues": [
+                "Basic",
+                "Standard",
+                "Premium"
+              ],
+              "metadata": {
+                "description": "Tier of your Azure Container Registry."
+              }
+            },
+            "workspaceId": {
+              "type": "string",
+              "metadata": {
+                "description": "Specifies the resource id of the Log Analytics workspace."
+              }
+            },
+            "location": {
+              "type": "string",
+              "defaultValue": "[resourceGroup().location]",
+              "metadata": {
+                "description": "Specifies the location."
+              }
+            },
+            "tags": {
+              "type": "object",
+              "metadata": {
+                "description": "Specifies the resource tags."
+              }
+            }
+          },
+          "variables": {
+            "copy": [
+              {
+                "name": "logs",
+                "count": "[length(variables('logCategories'))]",
+                "input": {
+                  "category": "[variables('logCategories')[copyIndex('logs')]]",
+                  "enabled": true,
+                  "retentionPolicy": {
+                    "enabled": true,
+                    "days": 0
+                  }
+                }
+              },
+              {
+                "name": "metrics",
+                "count": "[length(variables('metricCategories'))]",
+                "input": {
+                  "category": "[variables('metricCategories')[copyIndex('metrics')]]",
+                  "enabled": true,
+                  "retentionPolicy": {
+                    "enabled": true,
+                    "days": 0
+                  }
+                }
+              }
+            ],
+            "diagnosticSettingsName": "diagnosticSettings",
+            "logCategories": [
+              "ContainerRegistryRepositoryEvents",
+              "ContainerRegistryLoginEvents"
+            ],
+            "metricCategories": [
+              "AllMetrics"
+            ]
+          },
+          "resources": [
+            {
+              "type": "Microsoft.ContainerRegistry/registries",
+              "apiVersion": "2021-12-01-preview",
+              "name": "[parameters('name')]",
+              "location": "[parameters('location')]",
+              "tags": "[parameters('tags')]",
+              "sku": {
+                "name": "[parameters('sku')]"
+              },
+              "properties": {
+                "adminUserEnabled": "[parameters('adminUserEnabled')]"
+              }
+            },
+            {
+              "type": "Microsoft.Insights/diagnosticSettings",
+              "apiVersion": "2021-05-01-preview",
+              "scope": "[format('Microsoft.ContainerRegistry/registries/{0}', parameters('name'))]",
+              "name": "[variables('diagnosticSettingsName')]",
+              "properties": {
+                "workspaceId": "[parameters('workspaceId')]",
+                "logs": "[variables('logs')]",
+                "metrics": "[variables('metrics')]"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.ContainerRegistry/registries', parameters('name'))]"
+              ]
+            }
+          ],
+          "outputs": {
+            "resourceId": {
+              "type": "string",
+              "value": "[resourceId('Microsoft.ContainerRegistry/registries', parameters('name'))]"
+            },
+            "name": {
+              "type": "string",
+              "value": "[parameters('name')]"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('resourceGroupName')), 'Microsoft.Resources/deployments', take(format('{0}-law', variables('deploymentName')), 58))]"
+      ]
     },
     {
       "type": "Microsoft.Resources/deployments",
@@ -3262,6 +3434,15 @@
           },
           "natGatewayEnabled": {
             "value": false
+          },
+          "createAcrPrivateEndpoint": {
+            "value": true
+          },
+          "acrPrivateEndpointName": {
+            "value": "[format('pe-acr-{0}', variables('acrName'))]"
+          },
+          "acrId": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('resourceGroupName')), 'Microsoft.Resources/deployments', take(format('{0}-acr', variables('deploymentName')), 58)), '2022-09-01').outputs.resourceId.value]"
           },
           "location": {
             "value": "[parameters('location')]"
@@ -3903,6 +4084,7 @@
         }
       },
       "dependsOn": [
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('resourceGroupName')), 'Microsoft.Resources/deployments', take(format('{0}-acr', variables('deploymentName')), 58))]",
         "[subscriptionResourceId('Microsoft.Resources/deployments', take(format('{0}-rg', variables('deploymentName')), 58))]"
       ]
     },
@@ -13292,6 +13474,12 @@
           },
           "openAI_ModelName": {
             "value": "[variables('chatGptModelName')]"
+          },
+          "userAssignedIdentityId": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('resourceGroupName')), 'Microsoft.Resources/deployments', take(format('{0}-msi', variables('deploymentName')), 58)), '2022-09-01').outputs.miResourceId.value]"
+          },
+          "acrName": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('resourceGroupName')), 'Microsoft.Resources/deployments', take(format('{0}-acr', variables('deploymentName')), 58)), '2022-09-01').outputs.name.value]"
           }
         },
         "template": {
@@ -13301,7 +13489,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.22.6.54827",
-              "templateHash": "17579710674454918824"
+              "templateHash": "18358608712367112120"
             }
           },
           "parameters": {
@@ -13334,6 +13522,17 @@
             "tags": {
               "type": "object",
               "defaultValue": {}
+            },
+            "userAssignedIdentityId": {
+              "type": "string"
+            },
+            "acrName": {
+              "type": "string"
+            }
+          },
+          "variables": {
+            "userAssignedIdentities": {
+              "[format('{0}', parameters('userAssignedIdentityId'))]": {}
             }
           },
           "resources": [
@@ -13368,7 +13567,7 @@
                   "containers": {
                     "value": [
                       {
-                        "image": "ghcr.io/mckaywrigley/chatbot-ui:main",
+                        "image": "docker.io/massimocrippa/chatgpt-ui:1.0.6",
                         "name": "[parameters('appName')]",
                         "resources": {
                           "cpu": "[json('2')]",
@@ -13434,6 +13633,9 @@
                   },
                   "tags": {
                     "value": "[parameters('tags')]"
+                  },
+                  "userAssignedIdentities": {
+                    "value": "[variables('userAssignedIdentities')]"
                   }
                 },
                 "template": {
@@ -13975,8 +14177,492 @@
         }
       },
       "dependsOn": [
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('resourceGroupName')), 'Microsoft.Resources/deployments', take(format('{0}-acr', variables('deploymentName')), 58))]",
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('resourceGroupName')), 'Microsoft.Resources/deployments', take(format('{0}-acaenv', variables('deploymentName')), 58))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('resourceGroupName')), 'Microsoft.Resources/deployments', take(format('{0}-msi', variables('deploymentName')), 58))]",
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('resourceGroupName')), 'Microsoft.Resources/deployments', take(format('{0}-openai', variables('deploymentName')), 58))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "[take(format('{0}-apimgw', variables('deploymentName')), 58)]",
+      "resourceGroup": "[variables('resourceGroupName')]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "apiName": {
+            "value": "test"
+          },
+          "apiServicemName": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('resourceGroupName')), 'Microsoft.Resources/deployments', take(format('{0}-apim', variables('deploymentName')), 58)), '2022-09-01').outputs.name.value]"
+          },
+          "gatewayName": {
+            "value": "[variables('gwName')]"
+          },
+          "enableAppInsights": {
+            "value": true
+          },
+          "appInsightsResourceId": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('resourceGroupName')), 'Microsoft.Resources/deployments', take(format('{0}-ains', variables('deploymentName')), 58)), '2022-09-01').outputs.resourceId.value]"
+          },
+          "appInsightsKey": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('resourceGroupName')), 'Microsoft.Resources/deployments', take(format('{0}-ains', variables('deploymentName')), 58)), '2022-09-01').outputs.instrumentationKey.value]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.22.6.54827",
+              "templateHash": "16646498981249805057"
+            }
+          },
+          "parameters": {
+            "apiServicemName": {
+              "type": "string"
+            },
+            "apiName": {
+              "type": "string"
+            },
+            "gatewayName": {
+              "type": "string"
+            },
+            "enableAppInsights": {
+              "type": "bool",
+              "defaultValue": false
+            },
+            "appInsightsKey": {
+              "type": "string",
+              "defaultValue": ""
+            },
+            "appInsightsResourceId": {
+              "type": "string",
+              "defaultValue": ""
+            }
+          },
+          "variables": {
+            "apiFullName": "[format('{0}API', parameters('apiName'))]"
+          },
+          "resources": [
+            {
+              "type": "Microsoft.ApiManagement/service/gateways",
+              "apiVersion": "2021-08-01",
+              "name": "[format('{0}/{1}', parameters('apiServicemName'), parameters('gatewayName'))]",
+              "properties": {
+                "description": "APIM on Azure Container Apps",
+                "locationData": {
+                  "name": "[format('{0}-on-aca', parameters('gatewayName'))]",
+                  "countryOrRegion": "Cloud"
+                }
+              }
+            },
+            {
+              "type": "Microsoft.ApiManagement/service/apis",
+              "apiVersion": "2021-08-01",
+              "name": "[format('{0}/{1}', parameters('apiServicemName'), variables('apiFullName'))]",
+              "properties": {
+                "path": "[format('/{0}', parameters('apiName'))]",
+                "apiType": "http",
+                "displayName": "[format('{0} API', parameters('apiName'))]",
+                "subscriptionRequired": true,
+                "subscriptionKeyParameterNames": {
+                  "header": "apiKey",
+                  "query": "apiKey"
+                },
+                "protocols": [
+                  "http",
+                  "https"
+                ]
+              }
+            },
+            {
+              "type": "Microsoft.ApiManagement/service/gateways/apis",
+              "apiVersion": "2021-08-01",
+              "name": "[format('{0}/{1}/{2}', parameters('apiServicemName'), parameters('gatewayName'), variables('apiFullName'))]",
+              "properties": {},
+              "dependsOn": [
+                "[resourceId('Microsoft.ApiManagement/service/apis', parameters('apiServicemName'), variables('apiFullName'))]",
+                "[resourceId('Microsoft.ApiManagement/service/gateways', parameters('apiServicemName'), parameters('gatewayName'))]"
+              ]
+            },
+            {
+              "type": "Microsoft.ApiManagement/service/apis/policies",
+              "apiVersion": "2021-08-01",
+              "name": "[format('{0}/{1}/{2}', parameters('apiServicemName'), variables('apiFullName'), 'policy')]",
+              "properties": {
+                "value": "<policies><inbound><base /><rate-limit-by-key calls=\"60\" renewal-period=\"60\" counter-key=\"@(String.Concat(\"success_\", context.Request.IpAddress))\" increment-condition=\"@(context.Response.StatusCode >= 200 && context.Response.StatusCode < 300)\" /><rate-limit-by-key calls=\"20\" renewal-period=\"60\" counter-key=\"@(String.Concat(\"fail_\", context.Request.IpAddress))\" increment-condition=\"@(context.Response.StatusCode >= 400)\" /></inbound><backend><base /></backend><outbound><base /></outbound><on-error><base /></on-error></policies>",
+                "format": "rawxml"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.ApiManagement/service/apis', parameters('apiServicemName'), variables('apiFullName'))]"
+              ]
+            },
+            {
+              "condition": "[parameters('enableAppInsights')]",
+              "type": "Microsoft.ApiManagement/service/namedValues",
+              "apiVersion": "2022-08-01",
+              "name": "[format('{0}/{1}', parameters('apiServicemName'), 'appinsights-key')]",
+              "properties": {
+                "tags": [],
+                "secret": true,
+                "displayName": "appinsights-key",
+                "value": "[parameters('appInsightsKey')]"
+              }
+            },
+            {
+              "condition": "[parameters('enableAppInsights')]",
+              "type": "Microsoft.ApiManagement/service/loggers",
+              "apiVersion": "2022-08-01",
+              "name": "[format('{0}/{1}', parameters('apiServicemName'), 'applicationinsights')]",
+              "properties": {
+                "loggerType": "applicationInsights",
+                "description": "Application Insights instance dedicated to APIM logging",
+                "resourceId": "[parameters('appInsightsResourceId')]",
+                "credentials": {
+                  "instrumentationKey": "{{ appinsights-key }}"
+                }
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.ApiManagement/service/namedValues', parameters('apiServicemName'), 'appinsights-key')]"
+              ]
+            },
+            {
+              "condition": "[parameters('enableAppInsights')]",
+              "type": "Microsoft.ApiManagement/service/apis/diagnostics",
+              "apiVersion": "2022-08-01",
+              "name": "[format('{0}/{1}/{2}', parameters('apiServicemName'), variables('apiFullName'), 'applicationinsights')]",
+              "properties": {
+                "alwaysLog": "allErrors",
+                "loggerId": "[resourceId('Microsoft.ApiManagement/service/loggers', parameters('apiServicemName'), 'applicationinsights')]",
+                "logClientIp": true,
+                "httpCorrelationProtocol": "W3C",
+                "verbosity": "information",
+                "operationNameFormat": "Url"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.ApiManagement/service/apis', parameters('apiServicemName'), variables('apiFullName'))]",
+                "[resourceId('Microsoft.ApiManagement/service/loggers', parameters('apiServicemName'), 'applicationinsights')]"
+              ]
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('resourceGroupName')), 'Microsoft.Resources/deployments', take(format('{0}-apim', variables('deploymentName')), 58))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('resourceGroupName')), 'Microsoft.Resources/deployments', take(format('{0}-ains', variables('deploymentName')), 58))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "[take(format('{0}-script', variables('deploymentName')), 58)]",
+      "resourceGroup": "[variables('resourceGroupName')]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "managedIdentityName": {
+            "value": "msiholafay"
+          },
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "tags": {
+            "value": "[parameters('tags')]"
+          },
+          "expiryDate": {
+            "value": "2023-11-11T22:00:00Z"
+          },
+          "gwName": {
+            "value": "[variables('gwName')]"
+          },
+          "apimName": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('resourceGroupName')), 'Microsoft.Resources/deployments', take(format('{0}-apim', variables('deploymentName')), 58)), '2022-09-01').outputs.name.value]"
+          },
+          "rgName": {
+            "value": "[reference(subscriptionResourceId('Microsoft.Resources/deployments', take(format('{0}-rg', variables('deploymentName')), 58)), '2022-09-01').outputs.name.value]"
+          },
+          "sid": {
+            "value": "[subscription().subscriptionId]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.22.6.54827",
+              "templateHash": "16404963937592460884"
+            }
+          },
+          "parameters": {
+            "managedIdentityName": {
+              "type": "string",
+              "metadata": {
+                "description": "Required. The name of the Managed Identity to create."
+              }
+            },
+            "location": {
+              "type": "string"
+            },
+            "expiryDate": {
+              "type": "string",
+              "defaultValue": "2023-10-14T22:00:00Z"
+            },
+            "gwName": {
+              "type": "string",
+              "defaultValue": "gwapim"
+            },
+            "apimName": {
+              "type": "string",
+              "defaultValue": "apim-holafay"
+            },
+            "rgName": {
+              "type": "string",
+              "defaultValue": "rg-holafay"
+            },
+            "sid": {
+              "type": "string",
+              "defaultValue": "c1537527-c126-428d-8f72-1ac9f2c63c1f"
+            },
+            "tags": {
+              "type": "object",
+              "defaultValue": {},
+              "metadata": {
+                "description": "Optional: Tags"
+              }
+            },
+            "utcValue": {
+              "type": "string",
+              "defaultValue": "[utcNow()]",
+              "metadata": {
+                "description": "Optional: Current Time."
+              }
+            }
+          },
+          "variables": {
+            "$fxv#0": "GW_URI=\"https://management.azure.com/subscriptions/${sid}/resourceGroups/${rgName}/providers/Microsoft.ApiManagement/service/${apimName}/gateways/${gwName}/generateToken/?api-version=2022-08-01\"\nGW_TOKEN=$(az rest --method POST --uri \"${GW_URI}\" --body \"{ \\\"expiry\\\": \\\"${expiryDate}\\\", \\\"keyType\\\": \\\"primary\\\" }\" | jq .value | tr -d \"\\\"\")\nGW_TOKEN=\"GatewayKey ${GW_TOKEN}\"\necho $(jq --null-input --arg myToken \"$GW_TOKEN\" '{\"ApimToken\": $myToken }') > $AZ_SCRIPTS_OUTPUT_PATH"
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Resources/deploymentScripts",
+              "apiVersion": "2020-10-01",
+              "name": "deploymentScript",
+              "location": "[parameters('location')]",
+              "kind": "AzureCLI",
+              "identity": {
+                "type": "UserAssigned",
+                "userAssignedIdentities": {
+                  "[format('{0}', resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('managedIdentityName')))]": {}
+                }
+              },
+              "properties": {
+                "forceUpdateTag": "[parameters('utcValue')]",
+                "azCliVersion": "2.47.0",
+                "timeout": "PT10M",
+                "cleanupPreference": "Always",
+                "retentionInterval": "P1D",
+                "environmentVariables": [
+                  {
+                    "name": "expiryDate",
+                    "value": "[parameters('expiryDate')]"
+                  },
+                  {
+                    "name": "gwName",
+                    "value": "[parameters('gwName')]"
+                  },
+                  {
+                    "name": "apimName",
+                    "value": "[parameters('apimName')]"
+                  },
+                  {
+                    "name": "rgName",
+                    "value": "[parameters('rgName')]"
+                  },
+                  {
+                    "name": "sid",
+                    "value": "[parameters('sid')]"
+                  }
+                ],
+                "scriptContent": "[variables('$fxv#0')]"
+              },
+              "tags": "[parameters('tags')]"
+            }
+          ],
+          "outputs": {
+            "exists": {
+              "type": "bool",
+              "value": "[greater(length(reference(resourceId('Microsoft.Resources/deploymentScripts', 'deploymentScript'), '2020-10-01').outputs.ApimToken), 0)]"
+            },
+            "apimToken": {
+              "type": "string",
+              "value": "[reference(resourceId('Microsoft.Resources/deploymentScripts', 'deploymentScript'), '2020-10-01').outputs.ApimToken]"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('resourceGroupName')), 'Microsoft.Resources/deployments', take(format('{0}-apim', variables('deploymentName')), 58))]",
+        "[subscriptionResourceId('Microsoft.Resources/deployments', take(format('{0}-rg', variables('deploymentName')), 58))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "[take(format('{0}-acagw', variables('deploymentName')), 58)]",
+      "resourceGroup": "[variables('resourceGroupName')]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "apimName": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('resourceGroupName')), 'Microsoft.Resources/deployments', take(format('{0}-apim', variables('deploymentName')), 58)), '2022-09-01').outputs.name.value]"
+          },
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "projectCode": {
+            "value": "[variables('projectName')]"
+          },
+          "environmentId": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('resourceGroupName')), 'Microsoft.Resources/deployments', take(format('{0}-acaenv', variables('deploymentName')), 58)), '2022-09-01').outputs.resourceId.value]"
+          },
+          "gatewayToken": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('resourceGroupName')), 'Microsoft.Resources/deployments', take(format('{0}-script', variables('deploymentName')), 58)), '2022-09-01').outputs.apimToken.value]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.22.6.54827",
+              "templateHash": "3054904654581732283"
+            }
+          },
+          "parameters": {
+            "apimName": {
+              "type": "string"
+            },
+            "projectCode": {
+              "type": "string"
+            },
+            "isExternalIngress": {
+              "type": "bool",
+              "defaultValue": true
+            },
+            "location": {
+              "type": "string",
+              "defaultValue": "[resourceGroup().location]"
+            },
+            "environmentId": {
+              "type": "string"
+            },
+            "gatewayToken": {
+              "type": "securestring"
+            },
+            "gatewayTag": {
+              "type": "string",
+              "defaultValue": "latest"
+            },
+            "secrets": {
+              "type": "array",
+              "defaultValue": [
+                {
+                  "name": "apim-gateway-on-aca-token",
+                  "value": "[parameters('gatewayToken')]"
+                }
+              ]
+            }
+          },
+          "variables": {
+            "env": [
+              {
+                "name": "config.service.endpoint",
+                "value": "[format('{0}.configuration.azure-api.net', parameters('apimName'))]"
+              },
+              {
+                "name": "config.service.auth",
+                "secretRef": "[parameters('secrets')[0].name]"
+              }
+            ]
+          },
+          "resources": [
+            {
+              "type": "Microsoft.App/containerApps",
+              "apiVersion": "2022-10-01",
+              "name": "[format('{0}-ingress', parameters('projectCode'))]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "environmentId": "[parameters('environmentId')]",
+                "configuration": {
+                  "activeRevisionsMode": "Single",
+                  "ingress": {
+                    "allowInsecure": false,
+                    "external": "[parameters('isExternalIngress')]",
+                    "targetPort": 8080,
+                    "transport": "auto"
+                  },
+                  "secrets": "[parameters('secrets')]"
+                },
+                "template": {
+                  "containers": [
+                    {
+                      "image": "[format('mcr.microsoft.com/azure-api-management/gateway:{0}', parameters('gatewayTag'))]",
+                      "name": "[format('{0}-ingress', parameters('projectCode'))]",
+                      "env": "[variables('env')]",
+                      "resources": {
+                        "cpu": "[json('0.5')]",
+                        "memory": "1Gi"
+                      }
+                    }
+                  ],
+                  "scale": {
+                    "minReplicas": 1,
+                    "maxReplicas": 4,
+                    "rules": [
+                      {
+                        "name": "http",
+                        "http": {
+                          "metadata": {
+                            "concurrentRequests": "1000"
+                          }
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          ],
+          "outputs": {
+            "fqdn": {
+              "type": "string",
+              "value": "[reference(resourceId('Microsoft.App/containerApps', format('{0}-ingress', parameters('projectCode'))), '2022-10-01').configuration.ingress.fqdn]"
+            },
+            "ingressName": {
+              "type": "string",
+              "value": "[format('{0}-ingress', parameters('projectCode'))]"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('resourceGroupName')), 'Microsoft.Resources/deployments', take(format('{0}-acaenv', variables('deploymentName')), 58))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('resourceGroupName')), 'Microsoft.Resources/deployments', take(format('{0}-apim', variables('deploymentName')), 58))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('resourceGroupName')), 'Microsoft.Resources/deployments', take(format('{0}-script', variables('deploymentName')), 58))]"
       ]
     },
     {
@@ -14005,6 +14691,12 @@
                 "domainprefix": "lab2",
                 "originHostName": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('resourceGroupName')), 'Microsoft.Resources/deployments', take(format('{0}-chat', variables('deploymentName')), 58)), '2022-09-01').outputs.ingressFqdn.value]",
                 "probePath": "/",
+                "linkToDefaultDomain": "Disabled"
+              },
+              {
+                "domainprefix": "lab3",
+                "originHostName": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('resourceGroupName')), 'Microsoft.Resources/deployments', take(format('{0}-acagw', variables('deploymentName')), 58)), '2022-09-01').outputs.fqdn.value]",
+                "probePath": "/status-0123456789abcdef",
                 "linkToDefaultDomain": "Disabled"
               }
             ]
@@ -14543,490 +15235,9 @@
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('resourceGroupName')), 'Microsoft.Resources/deployments', take(format('{0}-apim', variables('deploymentName')), 58))]",
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('resourceGroupName')), 'Microsoft.Resources/deployments', take(format('{0}-app', variables('deploymentName')), 58))]",
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('resourceGroupName')), 'Microsoft.Resources/deployments', take(format('{0}-chat', variables('deploymentName')), 58))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('resourceGroupName')), 'Microsoft.Resources/deployments', take(format('{0}-acagw', variables('deploymentName')), 58))]",
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('resourceGroupName')), 'Microsoft.Resources/deployments', take(format('{0}-law', variables('deploymentName')), 58))]",
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('resourceGroupName')), 'Microsoft.Resources/deployments', take(format('{0}-pls', variables('deploymentName')), 58))]"
-      ]
-    },
-    {
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2022-09-01",
-      "name": "[take(format('{0}-apimgw', variables('deploymentName')), 58)]",
-      "resourceGroup": "[variables('resourceGroupName')]",
-      "properties": {
-        "expressionEvaluationOptions": {
-          "scope": "inner"
-        },
-        "mode": "Incremental",
-        "parameters": {
-          "apiName": {
-            "value": "test"
-          },
-          "apiServicemName": {
-            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('resourceGroupName')), 'Microsoft.Resources/deployments', take(format('{0}-apim', variables('deploymentName')), 58)), '2022-09-01').outputs.name.value]"
-          },
-          "gatewayName": {
-            "value": "[variables('gwName')]"
-          },
-          "enableAppInsights": {
-            "value": true
-          },
-          "appInsightsResourceId": {
-            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('resourceGroupName')), 'Microsoft.Resources/deployments', take(format('{0}-ains', variables('deploymentName')), 58)), '2022-09-01').outputs.resourceId.value]"
-          },
-          "appInsightsKey": {
-            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('resourceGroupName')), 'Microsoft.Resources/deployments', take(format('{0}-ains', variables('deploymentName')), 58)), '2022-09-01').outputs.instrumentationKey.value]"
-          }
-        },
-        "template": {
-          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-          "contentVersion": "1.0.0.0",
-          "metadata": {
-            "_generator": {
-              "name": "bicep",
-              "version": "0.22.6.54827",
-              "templateHash": "16646498981249805057"
-            }
-          },
-          "parameters": {
-            "apiServicemName": {
-              "type": "string"
-            },
-            "apiName": {
-              "type": "string"
-            },
-            "gatewayName": {
-              "type": "string"
-            },
-            "enableAppInsights": {
-              "type": "bool",
-              "defaultValue": false
-            },
-            "appInsightsKey": {
-              "type": "string",
-              "defaultValue": ""
-            },
-            "appInsightsResourceId": {
-              "type": "string",
-              "defaultValue": ""
-            }
-          },
-          "variables": {
-            "apiFullName": "[format('{0}API', parameters('apiName'))]"
-          },
-          "resources": [
-            {
-              "type": "Microsoft.ApiManagement/service/gateways",
-              "apiVersion": "2021-08-01",
-              "name": "[format('{0}/{1}', parameters('apiServicemName'), parameters('gatewayName'))]",
-              "properties": {
-                "description": "APIM on Azure Container Apps",
-                "locationData": {
-                  "name": "[format('{0}-on-aca', parameters('gatewayName'))]",
-                  "countryOrRegion": "Cloud"
-                }
-              }
-            },
-            {
-              "type": "Microsoft.ApiManagement/service/apis",
-              "apiVersion": "2021-08-01",
-              "name": "[format('{0}/{1}', parameters('apiServicemName'), variables('apiFullName'))]",
-              "properties": {
-                "path": "[format('/{0}', parameters('apiName'))]",
-                "apiType": "http",
-                "displayName": "[format('{0} API', parameters('apiName'))]",
-                "subscriptionRequired": true,
-                "subscriptionKeyParameterNames": {
-                  "header": "apiKey",
-                  "query": "apiKey"
-                },
-                "protocols": [
-                  "http",
-                  "https"
-                ]
-              }
-            },
-            {
-              "type": "Microsoft.ApiManagement/service/gateways/apis",
-              "apiVersion": "2021-08-01",
-              "name": "[format('{0}/{1}/{2}', parameters('apiServicemName'), parameters('gatewayName'), variables('apiFullName'))]",
-              "properties": {},
-              "dependsOn": [
-                "[resourceId('Microsoft.ApiManagement/service/apis', parameters('apiServicemName'), variables('apiFullName'))]",
-                "[resourceId('Microsoft.ApiManagement/service/gateways', parameters('apiServicemName'), parameters('gatewayName'))]"
-              ]
-            },
-            {
-              "type": "Microsoft.ApiManagement/service/apis/policies",
-              "apiVersion": "2021-08-01",
-              "name": "[format('{0}/{1}/{2}', parameters('apiServicemName'), variables('apiFullName'), 'policy')]",
-              "properties": {
-                "value": "<policies><inbound><base /><rate-limit-by-key calls=\"60\" renewal-period=\"60\" counter-key=\"@(String.Concat(\"success_\", context.Request.IpAddress))\" increment-condition=\"@(context.Response.StatusCode >= 200 && context.Response.StatusCode < 300)\" /><rate-limit-by-key calls=\"20\" renewal-period=\"60\" counter-key=\"@(String.Concat(\"fail_\", context.Request.IpAddress))\" increment-condition=\"@(context.Response.StatusCode >= 400)\" /></inbound><backend><base /></backend><outbound><base /></outbound><on-error><base /></on-error></policies>",
-                "format": "rawxml"
-              },
-              "dependsOn": [
-                "[resourceId('Microsoft.ApiManagement/service/apis', parameters('apiServicemName'), variables('apiFullName'))]"
-              ]
-            },
-            {
-              "condition": "[parameters('enableAppInsights')]",
-              "type": "Microsoft.ApiManagement/service/namedValues",
-              "apiVersion": "2022-08-01",
-              "name": "[format('{0}/{1}', parameters('apiServicemName'), 'appinsights-key')]",
-              "properties": {
-                "tags": [],
-                "secret": true,
-                "displayName": "appinsights-key",
-                "value": "[parameters('appInsightsKey')]"
-              }
-            },
-            {
-              "condition": "[parameters('enableAppInsights')]",
-              "type": "Microsoft.ApiManagement/service/loggers",
-              "apiVersion": "2022-08-01",
-              "name": "[format('{0}/{1}', parameters('apiServicemName'), 'applicationinsights')]",
-              "properties": {
-                "loggerType": "applicationInsights",
-                "description": "Application Insights instance dedicated to APIM logging",
-                "resourceId": "[parameters('appInsightsResourceId')]",
-                "credentials": {
-                  "instrumentationKey": "{{ appinsights-key }}"
-                }
-              },
-              "dependsOn": [
-                "[resourceId('Microsoft.ApiManagement/service/namedValues', parameters('apiServicemName'), 'appinsights-key')]"
-              ]
-            },
-            {
-              "condition": "[parameters('enableAppInsights')]",
-              "type": "Microsoft.ApiManagement/service/apis/diagnostics",
-              "apiVersion": "2022-08-01",
-              "name": "[format('{0}/{1}/{2}', parameters('apiServicemName'), variables('apiFullName'), 'applicationinsights')]",
-              "properties": {
-                "alwaysLog": "allErrors",
-                "loggerId": "[resourceId('Microsoft.ApiManagement/service/loggers', parameters('apiServicemName'), 'applicationinsights')]",
-                "logClientIp": true,
-                "httpCorrelationProtocol": "W3C",
-                "verbosity": "information",
-                "operationNameFormat": "Url"
-              },
-              "dependsOn": [
-                "[resourceId('Microsoft.ApiManagement/service/apis', parameters('apiServicemName'), variables('apiFullName'))]",
-                "[resourceId('Microsoft.ApiManagement/service/loggers', parameters('apiServicemName'), 'applicationinsights')]"
-              ]
-            }
-          ]
-        }
-      },
-      "dependsOn": [
-        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('resourceGroupName')), 'Microsoft.Resources/deployments', take(format('{0}-apim', variables('deploymentName')), 58))]",
-        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('resourceGroupName')), 'Microsoft.Resources/deployments', take(format('{0}-ains', variables('deploymentName')), 58))]"
-      ]
-    },
-    {
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2022-09-01",
-      "name": "[take(format('{0}-script', variables('deploymentName')), 58)]",
-      "resourceGroup": "[variables('resourceGroupName')]",
-      "properties": {
-        "expressionEvaluationOptions": {
-          "scope": "inner"
-        },
-        "mode": "Incremental",
-        "parameters": {
-          "managedIdentityName": {
-            "value": "msiholafay"
-          },
-          "location": {
-            "value": "[parameters('location')]"
-          },
-          "tags": {
-            "value": "[parameters('tags')]"
-          },
-          "expiryDate": {
-            "value": "2023-10-21T22:00:00Z"
-          },
-          "gwName": {
-            "value": "[variables('gwName')]"
-          },
-          "apimName": {
-            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('resourceGroupName')), 'Microsoft.Resources/deployments', take(format('{0}-apim', variables('deploymentName')), 58)), '2022-09-01').outputs.name.value]"
-          },
-          "rgName": {
-            "value": "[reference(subscriptionResourceId('Microsoft.Resources/deployments', take(format('{0}-rg', variables('deploymentName')), 58)), '2022-09-01').outputs.name.value]"
-          },
-          "sid": {
-            "value": "[subscription().subscriptionId]"
-          }
-        },
-        "template": {
-          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-          "contentVersion": "1.0.0.0",
-          "metadata": {
-            "_generator": {
-              "name": "bicep",
-              "version": "0.22.6.54827",
-              "templateHash": "16404963937592460884"
-            }
-          },
-          "parameters": {
-            "managedIdentityName": {
-              "type": "string",
-              "metadata": {
-                "description": "Required. The name of the Managed Identity to create."
-              }
-            },
-            "location": {
-              "type": "string"
-            },
-            "expiryDate": {
-              "type": "string",
-              "defaultValue": "2023-10-14T22:00:00Z"
-            },
-            "gwName": {
-              "type": "string",
-              "defaultValue": "gwapim"
-            },
-            "apimName": {
-              "type": "string",
-              "defaultValue": "apim-holafay"
-            },
-            "rgName": {
-              "type": "string",
-              "defaultValue": "rg-holafay"
-            },
-            "sid": {
-              "type": "string",
-              "defaultValue": "c1537527-c126-428d-8f72-1ac9f2c63c1f"
-            },
-            "tags": {
-              "type": "object",
-              "defaultValue": {},
-              "metadata": {
-                "description": "Optional: Tags"
-              }
-            },
-            "utcValue": {
-              "type": "string",
-              "defaultValue": "[utcNow()]",
-              "metadata": {
-                "description": "Optional: Current Time."
-              }
-            }
-          },
-          "variables": {
-            "$fxv#0": "GW_URI=\"https://management.azure.com/subscriptions/${sid}/resourceGroups/${rgName}/providers/Microsoft.ApiManagement/service/${apimName}/gateways/${gwName}/generateToken/?api-version=2022-08-01\"\nGW_TOKEN=$(az rest --method POST --uri \"${GW_URI}\" --body \"{ \\\"expiry\\\": \\\"${expiryDate}\\\", \\\"keyType\\\": \\\"primary\\\" }\" | jq .value | tr -d \"\\\"\")\nGW_TOKEN=\"GatewayKey ${GW_TOKEN}\"\necho $(jq --null-input --arg myToken \"$GW_TOKEN\" '{\"ApimToken\": $myToken }') > $AZ_SCRIPTS_OUTPUT_PATH"
-          },
-          "resources": [
-            {
-              "type": "Microsoft.Resources/deploymentScripts",
-              "apiVersion": "2020-10-01",
-              "name": "deploymentScript",
-              "location": "[parameters('location')]",
-              "kind": "AzureCLI",
-              "identity": {
-                "type": "UserAssigned",
-                "userAssignedIdentities": {
-                  "[format('{0}', resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('managedIdentityName')))]": {}
-                }
-              },
-              "properties": {
-                "forceUpdateTag": "[parameters('utcValue')]",
-                "azCliVersion": "2.47.0",
-                "timeout": "PT10M",
-                "cleanupPreference": "Always",
-                "retentionInterval": "P1D",
-                "environmentVariables": [
-                  {
-                    "name": "expiryDate",
-                    "value": "[parameters('expiryDate')]"
-                  },
-                  {
-                    "name": "gwName",
-                    "value": "[parameters('gwName')]"
-                  },
-                  {
-                    "name": "apimName",
-                    "value": "[parameters('apimName')]"
-                  },
-                  {
-                    "name": "rgName",
-                    "value": "[parameters('rgName')]"
-                  },
-                  {
-                    "name": "sid",
-                    "value": "[parameters('sid')]"
-                  }
-                ],
-                "scriptContent": "[variables('$fxv#0')]"
-              },
-              "tags": "[parameters('tags')]"
-            }
-          ],
-          "outputs": {
-            "exists": {
-              "type": "bool",
-              "value": "[greater(length(reference(resourceId('Microsoft.Resources/deploymentScripts', 'deploymentScript'), '2020-10-01').outputs.ApimToken), 0)]"
-            },
-            "apimToken": {
-              "type": "string",
-              "value": "[reference(resourceId('Microsoft.Resources/deploymentScripts', 'deploymentScript'), '2020-10-01').outputs.ApimToken]"
-            }
-          }
-        }
-      },
-      "dependsOn": [
-        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('resourceGroupName')), 'Microsoft.Resources/deployments', take(format('{0}-apim', variables('deploymentName')), 58))]",
-        "[subscriptionResourceId('Microsoft.Resources/deployments', take(format('{0}-rg', variables('deploymentName')), 58))]"
-      ]
-    },
-    {
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2022-09-01",
-      "name": "[take(format('{0}-acagw', variables('deploymentName')), 58)]",
-      "resourceGroup": "[variables('resourceGroupName')]",
-      "properties": {
-        "expressionEvaluationOptions": {
-          "scope": "inner"
-        },
-        "mode": "Incremental",
-        "parameters": {
-          "apimName": {
-            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('resourceGroupName')), 'Microsoft.Resources/deployments', take(format('{0}-apim', variables('deploymentName')), 58)), '2022-09-01').outputs.name.value]"
-          },
-          "location": {
-            "value": "[parameters('location')]"
-          },
-          "projectCode": {
-            "value": "[variables('projectName')]"
-          },
-          "environmentId": {
-            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('resourceGroupName')), 'Microsoft.Resources/deployments', take(format('{0}-acaenv', variables('deploymentName')), 58)), '2022-09-01').outputs.resourceId.value]"
-          },
-          "gatewayToken": {
-            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('resourceGroupName')), 'Microsoft.Resources/deployments', take(format('{0}-script', variables('deploymentName')), 58)), '2022-09-01').outputs.apimToken.value]"
-          }
-        },
-        "template": {
-          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-          "contentVersion": "1.0.0.0",
-          "metadata": {
-            "_generator": {
-              "name": "bicep",
-              "version": "0.22.6.54827",
-              "templateHash": "3054904654581732283"
-            }
-          },
-          "parameters": {
-            "apimName": {
-              "type": "string"
-            },
-            "projectCode": {
-              "type": "string"
-            },
-            "isExternalIngress": {
-              "type": "bool",
-              "defaultValue": true
-            },
-            "location": {
-              "type": "string",
-              "defaultValue": "[resourceGroup().location]"
-            },
-            "environmentId": {
-              "type": "string"
-            },
-            "gatewayToken": {
-              "type": "securestring"
-            },
-            "gatewayTag": {
-              "type": "string",
-              "defaultValue": "latest"
-            },
-            "secrets": {
-              "type": "array",
-              "defaultValue": [
-                {
-                  "name": "apim-gateway-on-aca-token",
-                  "value": "[parameters('gatewayToken')]"
-                }
-              ]
-            }
-          },
-          "variables": {
-            "env": [
-              {
-                "name": "config.service.endpoint",
-                "value": "[format('{0}.configuration.azure-api.net', parameters('apimName'))]"
-              },
-              {
-                "name": "config.service.auth",
-                "secretRef": "[parameters('secrets')[0].name]"
-              }
-            ]
-          },
-          "resources": [
-            {
-              "type": "Microsoft.App/containerApps",
-              "apiVersion": "2022-10-01",
-              "name": "[format('{0}-ingress', parameters('projectCode'))]",
-              "location": "[parameters('location')]",
-              "properties": {
-                "environmentId": "[parameters('environmentId')]",
-                "configuration": {
-                  "activeRevisionsMode": "Single",
-                  "ingress": {
-                    "allowInsecure": false,
-                    "external": "[parameters('isExternalIngress')]",
-                    "targetPort": 8080,
-                    "transport": "auto"
-                  },
-                  "secrets": "[parameters('secrets')]"
-                },
-                "template": {
-                  "containers": [
-                    {
-                      "image": "[format('mcr.microsoft.com/azure-api-management/gateway:{0}', parameters('gatewayTag'))]",
-                      "name": "[format('{0}-ingress', parameters('projectCode'))]",
-                      "env": "[variables('env')]",
-                      "resources": {
-                        "cpu": "[json('0.5')]",
-                        "memory": "1Gi"
-                      }
-                    }
-                  ],
-                  "scale": {
-                    "minReplicas": 1,
-                    "maxReplicas": 4,
-                    "rules": [
-                      {
-                        "name": "http",
-                        "http": {
-                          "metadata": {
-                            "concurrentRequests": "1000"
-                          }
-                        }
-                      }
-                    ]
-                  }
-                }
-              }
-            }
-          ],
-          "outputs": {
-            "fqdn": {
-              "type": "string",
-              "value": "[reference(resourceId('Microsoft.App/containerApps', format('{0}-ingress', parameters('projectCode'))), '2022-10-01').configuration.ingress.fqdn]"
-            },
-            "ingressName": {
-              "type": "string",
-              "value": "[format('{0}-ingress', parameters('projectCode'))]"
-            }
-          }
-        }
-      },
-      "dependsOn": [
-        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('resourceGroupName')), 'Microsoft.Resources/deployments', take(format('{0}-acaenv', variables('deploymentName')), 58))]",
-        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('resourceGroupName')), 'Microsoft.Resources/deployments', take(format('{0}-apim', variables('deploymentName')), 58))]",
-        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('resourceGroupName')), 'Microsoft.Resources/deployments', take(format('{0}-script', variables('deploymentName')), 58))]"
       ]
     }
   ],

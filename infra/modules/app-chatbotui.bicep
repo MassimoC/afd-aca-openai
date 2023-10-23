@@ -7,6 +7,22 @@ param openAI_ModelName string
 param replicas int = 1
 param location string = resourceGroup().location
 param tags object= {}
+param userAssignedIdentityId string
+param acrName string
+
+var userAssignedIdentities = {  '${userAssignedIdentityId}': {} }
+
+resource acr 'Microsoft.ContainerRegistry/registries@2023-07-01' existing = {
+  name: acrName
+  scope: resourceGroup()
+}
+
+var secretsObject = { secureList :  [
+  {
+    name: 'container-registry-password'
+    value: acr.listCredentials().passwords[0].value
+  }
+] }
 
 module app  '../CARML/app/container-app/main.bicep' = {
   name: take('${deployment().name}-${appName}', 64)
@@ -19,7 +35,8 @@ module app  '../CARML/app/container-app/main.bicep' = {
     ingressTransport:'auto'
     containers: [
       {
-        image: 'ghcr.io/mckaywrigley/chatbot-ui:main'
+        //image: '${acrName}.azurecr.io/chatbot-ui:1.0.1'
+        image: 'docker.io/massimocrippa/chatgpt-ui:1.0.6'
         name: appName
         resources:{
           cpu: json('2')
@@ -77,6 +94,14 @@ module app  '../CARML/app/container-app/main.bicep' = {
     scaleMaxReplicas: replicas
     location: location
     tags: tags
+    userAssignedIdentities: userAssignedIdentities
+    //secrets: secretsObject
+    // registries: [
+    //   {
+    //     server: '${acrName}.azurecr.io'
+    //     username: acr.listCredentials().username
+    //     passwordSecretRef: 'container-registry-password'
+    //   }]
   }
 }
 

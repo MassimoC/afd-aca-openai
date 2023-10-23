@@ -25,6 +25,7 @@ var acaEnvironmentName = 'env-${projectName}'
 var openAIName = 'ai-${projectName}'
 var apimName = 'apim-${projectName}'
 var aciName  = 'aci-${projectName}'
+var acrName  = projectName
 var infrastructureResourceGroupName = 'ME_${resourceGroupName}'
 var privateLinkServiceName = 'pls-${projectName}'
 var pepName = 'pe-${acaEnvironmentName}'
@@ -82,6 +83,9 @@ module modApplicationInsights 'CARML/insights/component/main.bicep' = {
   ]
 }
 
+// ---------------------------------------------------------
+// Managed Identity
+// ---------------------------------------------------------
 module modManagedIdentity 'modules/identities.bicep' = {
   name: take('${deploymentName}-msi', 58)
   scope : resourceGroup(resourceGroupName)
@@ -89,6 +93,21 @@ module modManagedIdentity 'modules/identities.bicep' = {
     name: msiName
     location:location
     tags:tags
+  }
+}
+
+// ---------------------------------------------------------
+// Container Registry
+// ---------------------------------------------------------
+module containerRegistry 'modules/registry.bicep' = {
+  name: take('${deploymentName}-acr', 58)
+  scope : resourceGroup(resourceGroupName)
+  params: {
+    name: acrName
+    adminUserEnabled: true
+    workspaceId: modLogAnalytics.outputs.resourceId
+    location: location
+    tags: tags
   }
 }
 
@@ -102,6 +121,9 @@ module modNetworking 'modules/network.bicep' = {
     virtualNetworkName: virtualNetworkName
     natGatewayName: natGatewayName
     natGatewayEnabled: false
+    createAcrPrivateEndpoint:true
+    acrPrivateEndpointName: 'pe-acr-${acrName}'
+    acrId: containerRegistry.outputs.resourceId
     location: location
   }
   dependsOn: [
@@ -359,60 +381,10 @@ module modAppChatbotUI 'modules/app-chatbotui.bicep' = {
     openAI_Host: openAIHost
     openAI_DeploymentId: chatGptDeploymentName
     openAI_ModelName: chatGptModelName
+    userAssignedIdentityId: modManagedIdentity.outputs.miResourceId
+    acrName: containerRegistry.outputs.name
   }
   dependsOn: [modOpenAI]
-}
-
-// ---------------------------------------------------------
-// Azure Frontdoor premium
-// ---------------------------------------------------------
-
-// APIM internal and PLS is mutually exclusive (one or the other)
-var apimHostName = split(modApim.outputs.gatewayURL, '/')[2]
-
-// open api REST api do not expose a probe endpoint
-var openAIHostName = split(modOpenAI.outputs.endpoint, '/')[2]
-
-
-var origins  = [
-  {
-    domainprefix: 'lab1'
-    originHostName: modApp.outputs.ingressFqdn
-    probePath: '/healthz'
-    linkToDefaultDomain:'Enabled'
-  }
-  {
-    domainprefix: 'lab2'
-    originHostName: modAppChatbotUI.outputs.ingressFqdn
-    probePath: '/'
-    linkToDefaultDomain:'Disabled'
-  }  
-  // {
-  //   domainprefix: 'lab2'
-  //   originHostName: apimHostName
-  //   probePath: '/status-0123456789abcdef'
-  //   linkToDefaultDomain:'Disabled'
-  // }
-]
-
-module frontDoor 'modules/frontdoor.bicep' = {
-  name: take('${deploymentName}-afd', 58)
-  scope : resourceGroup(resourceGroupName)
-  params: {
-    frontDoorName: frontDoorName
-    origins: origins
-    privateLinkResourceId: modPrivateLinkService.outputs.id
-    workspaceId: modLogAnalytics.outputs.resourceId
-    customDomainSuffix:customDomainSuffix
-    location: location
-    tags: tags
-  }
-  dependsOn: [
-    modPrivateLinkService
-    modLogAnalytics
-    modApp
-    modApim
-  ]
 }
 
 // ---------------------------------------------------------
@@ -444,7 +416,7 @@ module modDeploymentScript 'modules/deployment-script.bicep' = {
     managedIdentityName: 'msiholafay'
     location: location
     tags: tags
-    expiryDate: '2023-10-21T22:00:00Z'
+    expiryDate: '2023-11-11T22:00:00Z'
     gwName: gwName
     apimName: modApim.outputs.name
     rgName: modResourceGroup.outputs.name
@@ -470,6 +442,66 @@ module modGatewayOnAca 'modules/app-gateway-host.bicep' = {
     modAcaEnvironment
   ]
 }
+
+// ---------------------------------------------------------
+// Azure Frontdoor premium
+// ---------------------------------------------------------
+
+// APIM internal and PLS is mutually exclusive (one or the other)
+var apimHostName = split(modApim.outputs.gatewayURL, '/')[2]
+
+// open api REST api do not expose a probe endpoint
+var openAIHostName = split(modOpenAI.outputs.endpoint, '/')[2]
+
+
+var origins  = [
+  {
+    domainprefix: 'lab1'
+    originHostName: modApp.outputs.ingressFqdn
+    probePath: '/healthz'
+    linkToDefaultDomain:'Enabled'
+  }
+  {
+    domainprefix: 'lab2'
+    originHostName: modAppChatbotUI.outputs.ingressFqdn
+    probePath: '/'
+    linkToDefaultDomain:'Disabled'
+  }
+  {
+    domainprefix: 'lab3'
+    originHostName: modGatewayOnAca.outputs.fqdn
+    probePath: '/status-0123456789abcdef'
+    linkToDefaultDomain:'Disabled'
+  }  
+  // {
+  //   domainprefix: 'lab2'
+  //   originHostName: apimHostName
+  //   probePath: '/status-0123456789abcdef'
+  //   linkToDefaultDomain:'Disabled'
+  // }
+]
+
+module frontDoor 'modules/frontdoor.bicep' = {
+  name: take('${deploymentName}-afd', 58)
+  scope : resourceGroup(resourceGroupName)
+  params: {
+    frontDoorName: frontDoorName
+    origins: origins
+    privateLinkResourceId: modPrivateLinkService.outputs.id
+    workspaceId: modLogAnalytics.outputs.resourceId
+    customDomainSuffix:customDomainSuffix
+    location: location
+    tags: tags
+  }
+  dependsOn: [
+    modPrivateLinkService
+    modLogAnalytics
+    modApp
+    modApim
+  ]
+}
+
+
 
 output rgName string = modResourceGroup.outputs.name
 output plsName string = modPrivateLinkService.outputs.name

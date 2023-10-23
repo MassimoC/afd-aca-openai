@@ -8,5 +8,7 @@ resource userAssignedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@
   tags:tags
 }
 
+
+output miResourceId string = userAssignedIdentity.id
 output miPrincipalId string = userAssignedIdentity.properties.principalId
 output miClientId string = userAssignedIdentity.properties.clientId
