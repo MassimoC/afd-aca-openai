@@ -4,8 +4,8 @@
   "metadata": {
     "_generator": {
       "name": "bicep",
-      "version": "0.22.6.54827",
-      "templateHash": "7146774651651149375"
+      "version": "0.23.1.45101",
+      "templateHash": "18159369662308696251"
     }
   },
   "parameters": {
@@ -89,8 +89,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.22.6.54827",
-              "templateHash": "698589074683460032"
+              "version": "0.23.1.45101",
+              "templateHash": "1920019735803612451"
             },
             "name": "Resource Groups",
             "description": "This module deploys a Resource Group.",
@@ -201,8 +201,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.22.6.54827",
-                      "templateHash": "8961143332409950444"
+                      "version": "0.23.1.45101",
+                      "templateHash": "11141983424917801407"
                     },
                     "name": "Authorization Locks (Resource Group scope)",
                     "description": "This module deploys an Authorization Lock at a Resource Group scope.",
@@ -334,8 +334,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.22.6.54827",
-                      "templateHash": "9238529270860750175"
+                      "version": "0.23.1.45101",
+                      "templateHash": "13976546302901379815"
                     }
                   },
                   "parameters": {
@@ -687,8 +687,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.22.6.54827",
-              "templateHash": "13390587976888913833"
+              "version": "0.23.1.45101",
+              "templateHash": "111618625313816237"
             },
             "name": "Log Analytics Workspaces",
             "description": "This module deploys a Log Analytics Workspace.",
@@ -1082,8 +1082,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.22.6.54827",
-                      "templateHash": "6643427484780531502"
+                      "version": "0.23.1.45101",
+                      "templateHash": "16776560053817423446"
                     },
                     "name": "Log Analytics Workspace Storage Insight Configs",
                     "description": "This module deploys a Log Analytics Workspace Storage Insight Config.",
@@ -1229,8 +1229,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.22.6.54827",
-                      "templateHash": "15022791045507209174"
+                      "version": "0.23.1.45101",
+                      "templateHash": "12906485985263838603"
                     },
                     "name": "Log Analytics Workspace Linked Services",
                     "description": "This module deploys a Log Analytics Workspace Linked Service.",
@@ -1366,8 +1366,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.22.6.54827",
-                      "templateHash": "2117697022066188694"
+                      "version": "0.23.1.45101",
+                      "templateHash": "9016006615324724877"
                     },
                     "name": "Log Analytics Workspace Linked Storage Accounts",
                     "description": "This module deploys a Log Analytics Workspace Linked Storage Account.",
@@ -1504,8 +1504,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.22.6.54827",
-                      "templateHash": "12667331360871593591"
+                      "version": "0.23.1.45101",
+                      "templateHash": "8110791564584546252"
                     },
                     "name": "Log Analytics Workspace Saved Searches",
                     "description": "This module deploys a Log Analytics Workspace Saved Search.",
@@ -1679,8 +1679,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.22.6.54827",
-                      "templateHash": "7753879701724594327"
+                      "version": "0.23.1.45101",
+                      "templateHash": "17342339934568813477"
                     },
                     "name": "Log Analytics Workspace Data Exports",
                     "description": "This module deploys a Log Analytics Workspace Data Export.",
@@ -1829,8 +1829,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.22.6.54827",
-                      "templateHash": "7994060758159745935"
+                      "version": "0.23.1.45101",
+                      "templateHash": "5219542328300853106"
                     },
                     "name": "Log Analytics Workspace Datasources",
                     "description": "This module deploys a Log Analytics Workspace Data Source.",
@@ -2059,8 +2059,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.22.6.54827",
-                      "templateHash": "9983426146462646968"
+                      "version": "0.23.1.45101",
+                      "templateHash": "10977258600449669407"
                     },
                     "name": "Log Analytics Workspace Tables",
                     "description": "This module deploys a Log Analytics Workspace Table.",
@@ -2231,8 +2231,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.22.6.54827",
-                      "templateHash": "2318608107759137473"
+                      "version": "0.23.1.45101",
+                      "templateHash": "6590935071601965866"
                     },
                     "name": "Operations Management Solutions",
                     "description": "This module deploys an Operations Management Solution.",
@@ -2385,8 +2385,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.22.6.54827",
-                      "templateHash": "17191832464911210338"
+                      "version": "0.23.1.45101",
+                      "templateHash": "6190525379812728386"
                     }
                   },
                   "parameters": {
@@ -2591,8 +2591,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.22.6.54827",
-              "templateHash": "10525905837638712461"
+              "version": "0.23.1.45101",
+              "templateHash": "7440675086203466201"
             },
             "name": "Application Insights",
             "description": "This component deploys an Application Insights instance.",
@@ -2883,8 +2883,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.22.6.54827",
-                      "templateHash": "11402620495113145502"
+                      "version": "0.23.1.45101",
+                      "templateHash": "17264878235078639718"
                     }
                   },
                   "parameters": {
@@ -3205,8 +3205,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.22.6.54827",
-              "templateHash": "14050957206902388504"
+              "version": "0.23.1.45101",
+              "templateHash": "14389011799265866346"
             }
           },
           "parameters": {
@@ -3281,8 +3281,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.22.6.54827",
-              "templateHash": "17126512067433833009"
+              "version": "0.23.1.45101",
+              "templateHash": "4965931997954241789"
             }
           },
           "parameters": {
@@ -3454,8 +3454,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.22.6.54827",
-              "templateHash": "6109303783102757834"
+              "version": "0.23.1.45101",
+              "templateHash": "17684594592850747994"
             }
           },
           "parameters": {
@@ -4115,8 +4115,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.22.6.54827",
-              "templateHash": "3348513206726382635"
+              "version": "0.23.1.45101",
+              "templateHash": "3528621276345754772"
             }
           },
           "parameters": {
@@ -4256,8 +4256,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.22.6.54827",
-              "templateHash": "7449129905947671585"
+              "version": "0.23.1.45101",
+              "templateHash": "10662376803009166811"
             },
             "name": "App ManagedEnvironments",
             "description": "This module deploys an App Managed Environment (also known as a Container App Environment).",
@@ -4506,8 +4506,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.22.6.54827",
-                      "templateHash": "18101859194273235473"
+                      "version": "0.23.1.45101",
+                      "templateHash": "9466156313339370284"
                     }
                   },
                   "parameters": {
@@ -4710,8 +4710,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.22.6.54827",
-              "templateHash": "3848617210454984965"
+              "version": "0.23.1.45101",
+              "templateHash": "903031576287204116"
             },
             "name": "API Management Services",
             "description": "This module deploys an API Management Service.",
@@ -5207,8 +5207,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.22.6.54827",
-                      "templateHash": "17340528539230351720"
+                      "version": "0.23.1.45101",
+                      "templateHash": "11512052528068634292"
                     },
                     "name": "API Management Service APIs",
                     "description": "This module deploys an API Management Service API.",
@@ -5487,8 +5487,8 @@
                           "metadata": {
                             "_generator": {
                               "name": "bicep",
-                              "version": "0.22.6.54827",
-                              "templateHash": "14571499926134179860"
+                              "version": "0.23.1.45101",
+                              "templateHash": "17230254380289042348"
                             },
                             "name": "API Management Service APIs Policies",
                             "description": "This module deploys an API Management Service API Policy.",
@@ -5657,8 +5657,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.22.6.54827",
-                      "templateHash": "12233980723609740158"
+                      "version": "0.23.1.45101",
+                      "templateHash": "16962621369738378491"
                     },
                     "name": "API Management Service API Version Sets",
                     "description": "This module deploys an API Management Service API Version Set.",
@@ -5797,8 +5797,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.22.6.54827",
-                      "templateHash": "7988688467600216709"
+                      "version": "0.23.1.45101",
+                      "templateHash": "4791396269511004286"
                     },
                     "name": "API Management Service Authorization Servers",
                     "description": "This module deploys an API Management Service Authorization Server.",
@@ -6045,8 +6045,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.22.6.54827",
-                      "templateHash": "3713166604792624713"
+                      "version": "0.23.1.45101",
+                      "templateHash": "14371393063475773678"
                     },
                     "name": "API Management Service Backends",
                     "description": "This module deploys an API Management Service Backend.",
@@ -6239,8 +6239,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.22.6.54827",
-                      "templateHash": "4933923478377534151"
+                      "version": "0.23.1.45101",
+                      "templateHash": "10312358305910336044"
                     },
                     "name": "API Management Service Caches",
                     "description": "This module deploys an API Management Service Cache.",
@@ -6390,8 +6390,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.22.6.54827",
-                      "templateHash": "13822474427587974385"
+                      "version": "0.23.1.45101",
+                      "templateHash": "13036858747462562466"
                     },
                     "name": "API Management Service Identity Providers",
                     "description": "This module deploys an API Management Service Identity Provider.",
@@ -6606,8 +6606,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.22.6.54827",
-                      "templateHash": "3581707708141744852"
+                      "version": "0.23.1.45101",
+                      "templateHash": "10641463376324079563"
                     },
                     "name": "API Management Service Named Values",
                     "description": "This module deploys an API Management Service Named Value.",
@@ -6759,8 +6759,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.22.6.54827",
-                      "templateHash": "1124223085084988655"
+                      "version": "0.23.1.45101",
+                      "templateHash": "12676245745541867340"
                     },
                     "name": "API Management Service Portal Settings",
                     "description": "This module deploys an API Management Service Portal Setting.",
@@ -6882,8 +6882,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.22.6.54827",
-                      "templateHash": "3650757020022888901"
+                      "version": "0.23.1.45101",
+                      "templateHash": "16586961527396343119"
                     },
                     "name": "API Management Service Policies",
                     "description": "This module deploys an API Management Service Policy.",
@@ -7022,8 +7022,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.22.6.54827",
-                      "templateHash": "2758822676627115160"
+                      "version": "0.23.1.45101",
+                      "templateHash": "8527180272588578376"
                     },
                     "name": "API Management Service Products",
                     "description": "This module deploys an API Management Service Product.",
@@ -7171,8 +7171,8 @@
                           "metadata": {
                             "_generator": {
                               "name": "bicep",
-                              "version": "0.22.6.54827",
-                              "templateHash": "16488730655399972556"
+                              "version": "0.23.1.45101",
+                              "templateHash": "17352324470715058273"
                             },
                             "name": "API Management Service Products APIs",
                             "description": "This module deploys an API Management Service Product API.",
@@ -7285,8 +7285,8 @@
                           "metadata": {
                             "_generator": {
                               "name": "bicep",
-                              "version": "0.22.6.54827",
-                              "templateHash": "14085709622188800883"
+                              "version": "0.23.1.45101",
+                              "templateHash": "16541523008963717147"
                             },
                             "name": "API Management Service Products Groups",
                             "description": "This module deploys an API Management Service Product Group.",
@@ -7451,8 +7451,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.22.6.54827",
-                      "templateHash": "10733141744485121232"
+                      "version": "0.23.1.45101",
+                      "templateHash": "15367144313924447449"
                     },
                     "name": "API Management Service Subscriptions",
                     "description": "This module deploys an API Management Service Subscription.",
@@ -7614,8 +7614,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.22.6.54827",
-                      "templateHash": "1194193235287598548"
+                      "version": "0.23.1.45101",
+                      "templateHash": "7569035527960271780"
                     }
                   },
                   "parameters": {
@@ -7822,8 +7822,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.22.6.54827",
-              "templateHash": "3061856352901323742"
+              "version": "0.23.1.45101",
+              "templateHash": "15152344690252817134"
             }
           },
           "parameters": {
@@ -7916,8 +7916,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.22.6.54827",
-              "templateHash": "3061856352901323742"
+              "version": "0.23.1.45101",
+              "templateHash": "15152344690252817134"
             }
           },
           "parameters": {
@@ -8010,8 +8010,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.22.6.54827",
-              "templateHash": "3061856352901323742"
+              "version": "0.23.1.45101",
+              "templateHash": "15152344690252817134"
             }
           },
           "parameters": {
@@ -8116,8 +8116,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.22.6.54827",
-              "templateHash": "17798350513678178989"
+              "version": "0.23.1.45101",
+              "templateHash": "17412524956612964262"
             }
           },
           "parameters": {
@@ -8271,8 +8271,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.22.6.54827",
-              "templateHash": "1966554911283320926"
+              "version": "0.23.1.45101",
+              "templateHash": "16267960087917597092"
             }
           },
           "parameters": {
@@ -8367,8 +8367,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.22.6.54827",
-              "templateHash": "10521886651491583370"
+              "version": "0.23.1.45101",
+              "templateHash": "18099973343479505448"
             }
           },
           "parameters": {
@@ -8466,8 +8466,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.22.6.54827",
-                      "templateHash": "6208883246276815797"
+                      "version": "0.23.1.45101",
+                      "templateHash": "2977447382936666104"
                     },
                     "name": "Container Apps",
                     "description": "This module deploys a Container App.",
@@ -8833,8 +8833,8 @@
                           "metadata": {
                             "_generator": {
                               "name": "bicep",
-                              "version": "0.22.6.54827",
-                              "templateHash": "6133741258710054291"
+                              "version": "0.23.1.45101",
+                              "templateHash": "9128905736185925869"
                             }
                           },
                           "parameters": {
@@ -9035,8 +9035,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.22.6.54827",
-              "templateHash": "7094231343264488816"
+              "version": "0.23.1.45101",
+              "templateHash": "3992445759947055830"
             },
             "name": "Private DNS Zones",
             "description": "This module deploys a Private DNS zone.",
@@ -9226,8 +9226,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.22.6.54827",
-                      "templateHash": "3286674755199812485"
+                      "version": "0.23.1.45101",
+                      "templateHash": "2537763051884043648"
                     },
                     "name": "Private DNS Zone A record",
                     "description": "This module deploys a Private DNS Zone A record.",
@@ -9341,8 +9341,8 @@
                           "metadata": {
                             "_generator": {
                               "name": "bicep",
-                              "version": "0.22.6.54827",
-                              "templateHash": "13885309482367640092"
+                              "version": "0.23.1.45101",
+                              "templateHash": "12813207891622218766"
                             }
                           },
                           "parameters": {
@@ -9548,8 +9548,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.22.6.54827",
-                      "templateHash": "17200265918515224034"
+                      "version": "0.23.1.45101",
+                      "templateHash": "9245044783420537453"
                     },
                     "name": "Private DNS Zone AAAA record",
                     "description": "This module deploys a Private DNS Zone AAAA record.",
@@ -9663,8 +9663,8 @@
                           "metadata": {
                             "_generator": {
                               "name": "bicep",
-                              "version": "0.22.6.54827",
-                              "templateHash": "370590810970469037"
+                              "version": "0.23.1.45101",
+                              "templateHash": "845487057456432992"
                             }
                           },
                           "parameters": {
@@ -9870,8 +9870,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.22.6.54827",
-                      "templateHash": "1218346372201244802"
+                      "version": "0.23.1.45101",
+                      "templateHash": "5596834079312241442"
                     },
                     "name": "Private DNS Zone CNAME record",
                     "description": "This module deploys a Private DNS Zone CNAME record.",
@@ -9985,8 +9985,8 @@
                           "metadata": {
                             "_generator": {
                               "name": "bicep",
-                              "version": "0.22.6.54827",
-                              "templateHash": "3701509590842402185"
+                              "version": "0.23.1.45101",
+                              "templateHash": "1577097157593604251"
                             }
                           },
                           "parameters": {
@@ -10198,8 +10198,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.22.6.54827",
-                      "templateHash": "498719698216860438"
+                      "version": "0.23.1.45101",
+                      "templateHash": "5923624253079795353"
                     },
                     "name": "Private DNS Zone MX record",
                     "description": "This module deploys a Private DNS Zone MX record.",
@@ -10313,8 +10313,8 @@
                           "metadata": {
                             "_generator": {
                               "name": "bicep",
-                              "version": "0.22.6.54827",
-                              "templateHash": "3875667684091614842"
+                              "version": "0.23.1.45101",
+                              "templateHash": "4993954463757940492"
                             }
                           },
                           "parameters": {
@@ -10520,8 +10520,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.22.6.54827",
-                      "templateHash": "15278019758073479253"
+                      "version": "0.23.1.45101",
+                      "templateHash": "3350777100573060858"
                     },
                     "name": "Private DNS Zone PTR record",
                     "description": "This module deploys a Private DNS Zone PTR record.",
@@ -10635,8 +10635,8 @@
                           "metadata": {
                             "_generator": {
                               "name": "bicep",
-                              "version": "0.22.6.54827",
-                              "templateHash": "1115653551360161833"
+                              "version": "0.23.1.45101",
+                              "templateHash": "15281856596965361200"
                             }
                           },
                           "parameters": {
@@ -10842,8 +10842,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.22.6.54827",
-                      "templateHash": "2312801328936888366"
+                      "version": "0.23.1.45101",
+                      "templateHash": "6542959145132322398"
                     },
                     "name": "Private DNS Zone SOA record",
                     "description": "This module deploys a Private DNS Zone SOA record.",
@@ -10957,8 +10957,8 @@
                           "metadata": {
                             "_generator": {
                               "name": "bicep",
-                              "version": "0.22.6.54827",
-                              "templateHash": "7407904296801266090"
+                              "version": "0.23.1.45101",
+                              "templateHash": "13808237017217538095"
                             }
                           },
                           "parameters": {
@@ -11164,8 +11164,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.22.6.54827",
-                      "templateHash": "5952665052269893806"
+                      "version": "0.23.1.45101",
+                      "templateHash": "5636868334842591876"
                     },
                     "name": "Private DNS Zone SRV record",
                     "description": "This module deploys a Private DNS Zone SRV record.",
@@ -11279,8 +11279,8 @@
                           "metadata": {
                             "_generator": {
                               "name": "bicep",
-                              "version": "0.22.6.54827",
-                              "templateHash": "7603100820795358011"
+                              "version": "0.23.1.45101",
+                              "templateHash": "10556306140169529743"
                             }
                           },
                           "parameters": {
@@ -11486,8 +11486,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.22.6.54827",
-                      "templateHash": "1124215030878784014"
+                      "version": "0.23.1.45101",
+                      "templateHash": "2189744141742184447"
                     },
                     "name": "Private DNS Zone TXT record",
                     "description": "This module deploys a Private DNS Zone TXT record.",
@@ -11601,8 +11601,8 @@
                           "metadata": {
                             "_generator": {
                               "name": "bicep",
-                              "version": "0.22.6.54827",
-                              "templateHash": "16791864516622438253"
+                              "version": "0.23.1.45101",
+                              "templateHash": "2830214110581529836"
                             }
                           },
                           "parameters": {
@@ -11808,8 +11808,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.22.6.54827",
-                      "templateHash": "12342244725180262876"
+                      "version": "0.23.1.45101",
+                      "templateHash": "16183520759333709275"
                     },
                     "name": "Private DNS Zone Virtual Network Link",
                     "description": "This module deploys a Private DNS Zone Virtual Network Link.",
@@ -11963,8 +11963,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.22.6.54827",
-                      "templateHash": "2044377995221762227"
+                      "version": "0.23.1.45101",
+                      "templateHash": "1405706760514493424"
                     }
                   },
                   "parameters": {
@@ -12213,8 +12213,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.22.6.54827",
-              "templateHash": "6152535873625412444"
+              "version": "0.23.1.45101",
+              "templateHash": "4321510735963197477"
             },
             "name": "Cognitive Services",
             "description": "This module deploys a Cognitive Service.",
@@ -12688,8 +12688,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.22.6.54827",
-                      "templateHash": "2884140170473394983"
+                      "version": "0.23.1.45101",
+                      "templateHash": "14081059099058221912"
                     },
                     "name": "Private Endpoints",
                     "description": "This module deploys a Private Endpoint.",
@@ -12888,8 +12888,8 @@
                           "metadata": {
                             "_generator": {
                               "name": "bicep",
-                              "version": "0.22.6.54827",
-                              "templateHash": "5610247137574346230"
+                              "version": "0.23.1.45101",
+                              "templateHash": "9267835913800982034"
                             },
                             "name": "Private Endpoint Private DNS Zone Groups",
                             "description": "This module deploys a Private Endpoint Private DNS Zone Group.",
@@ -13026,8 +13026,8 @@
                           "metadata": {
                             "_generator": {
                               "name": "bicep",
-                              "version": "0.22.6.54827",
-                              "templateHash": "14351187799927334028"
+                              "version": "0.23.1.45101",
+                              "templateHash": "7828421530828782575"
                             }
                           },
                           "parameters": {
@@ -13240,8 +13240,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.22.6.54827",
-                      "templateHash": "2121072685211673304"
+                      "version": "0.23.1.45101",
+                      "templateHash": "4247296732076427026"
                     }
                   },
                   "parameters": {
@@ -13488,8 +13488,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.22.6.54827",
-              "templateHash": "18358608712367112120"
+              "version": "0.23.1.45101",
+              "templateHash": "12919914447969093242"
             }
           },
           "parameters": {
@@ -13644,8 +13644,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.22.6.54827",
-                      "templateHash": "6208883246276815797"
+                      "version": "0.23.1.45101",
+                      "templateHash": "2977447382936666104"
                     },
                     "name": "Container Apps",
                     "description": "This module deploys a Container App.",
@@ -14011,8 +14011,8 @@
                           "metadata": {
                             "_generator": {
                               "name": "bicep",
-                              "version": "0.22.6.54827",
-                              "templateHash": "6133741258710054291"
+                              "version": "0.23.1.45101",
+                              "templateHash": "9128905736185925869"
                             }
                           },
                           "parameters": {
@@ -14219,8 +14219,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.22.6.54827",
-              "templateHash": "16646498981249805057"
+              "version": "0.23.1.45101",
+              "templateHash": "4639055787495455464"
             }
           },
           "parameters": {
@@ -14379,7 +14379,7 @@
             "value": "[parameters('tags')]"
           },
           "expiryDate": {
-            "value": "2023-11-11T22:00:00Z"
+            "value": "2024-01-10T22:00:00Z"
           },
           "gwName": {
             "value": "[variables('gwName')]"
@@ -14400,8 +14400,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.22.6.54827",
-              "templateHash": "16404963937592460884"
+              "version": "0.23.1.45101",
+              "templateHash": "13724155338234207745"
             }
           },
           "parameters": {
@@ -14416,7 +14416,7 @@
             },
             "expiryDate": {
               "type": "string",
-              "defaultValue": "2023-10-14T22:00:00Z"
+              "defaultValue": "2024-01-10T22:00:00Z"
             },
             "gwName": {
               "type": "string",
@@ -14548,8 +14548,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.22.6.54827",
-              "templateHash": "3054904654581732283"
+              "version": "0.23.1.45101",
+              "templateHash": "166632759190286176"
             }
           },
           "parameters": {
@@ -14698,6 +14698,12 @@
                 "originHostName": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('resourceGroupName')), 'Microsoft.Resources/deployments', take(format('{0}-acagw', variables('deploymentName')), 58)), '2022-09-01').outputs.fqdn.value]",
                 "probePath": "/status-0123456789abcdef",
                 "linkToDefaultDomain": "Disabled"
+              },
+              {
+                "domainprefix": "lab4",
+                "originHostName": "[split(reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('resourceGroupName')), 'Microsoft.Resources/deployments', take(format('{0}-apim', variables('deploymentName')), 58)), '2022-09-01').outputs.gatewayURL.value, '/')[2]]",
+                "probePath": "/status-0123456789abcdef",
+                "linkToDefaultDomain": "Disabled"
               }
             ]
           },
@@ -14723,8 +14729,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.22.6.54827",
-              "templateHash": "4493643383612165797"
+              "version": "0.23.1.45101",
+              "templateHash": "674422722964347730"
             }
           },
           "parameters": {
@@ -15075,8 +15081,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.22.6.54827",
-                      "templateHash": "8050308700456466551"
+                      "version": "0.23.1.45101",
+                      "templateHash": "17363704580988073576"
                     }
                   },
                   "parameters": {

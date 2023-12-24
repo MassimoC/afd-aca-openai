@@ -416,7 +416,7 @@ module modDeploymentScript 'modules/deployment-script.bicep' = {
     managedIdentityName: 'msiholafay'
     location: location
     tags: tags
-    expiryDate: '2023-11-11T22:00:00Z'
+    expiryDate: '2024-01-10T22:00:00Z'
     gwName: gwName
     apimName: modApim.outputs.name
     rgName: modResourceGroup.outputs.name
@@ -470,6 +470,12 @@ var origins  = [
   {
     domainprefix: 'lab3'
     originHostName: modGatewayOnAca.outputs.fqdn
+    probePath: '/status-0123456789abcdef'
+    linkToDefaultDomain:'Disabled'
+  }
+  {
+    domainprefix: 'lab4'
+    originHostName: apimHostName
     probePath: '/status-0123456789abcdef'
     linkToDefaultDomain:'Disabled'
   }  

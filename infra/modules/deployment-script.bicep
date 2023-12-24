@@ -2,7 +2,7 @@
 param managedIdentityName string
 param location string
 
-param expiryDate string = '2023-10-14T22:00:00Z'
+param expiryDate string = '2024-01-10T22:00:00Z'
 param gwName string = 'gwapim'
 param apimName string = 'apim-holafay'
 param rgName string = 'rg-holafay'
