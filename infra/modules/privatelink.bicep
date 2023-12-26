@@ -6,6 +6,7 @@ param loadBalancerName string
 //param loadBalancerResourceGroupName string
 param subnetId string
 param peSubnetId string
+param apimResourceId string
 param acaDefaultDomainName string
 param privateIPAllocationMethod string = 'Dynamic'
 param privateIPAddressVersion string = 'IPv4'
@@ -79,6 +80,28 @@ resource privateEndpoint 'Microsoft.Network/privateEndpoints@2021-05-01' = {
     ]
   }
 }
+
+// // adding the APIM private endpoint as well, the overall script it is not modular at all (hey it's a demo). 
+// resource privateEndpointApim 'Microsoft.Network/privateEndpoints@2021-05-01' = {
+//   name: 'pe-apim'
+//   location: location
+//   properties: {
+//     subnet: {
+//       id: peSubnetId
+//     }
+//     privateLinkServiceConnections: [
+//       {
+//         name: 'privalink-apim'
+//         properties: {
+//           privateLinkServiceId: apimResourceId
+//           groupIds: [
+//             'Gateway'
+//           ]
+//         }
+//       }
+//     ]
+//   }
+// }
 
 // Outputs
 output id string = privateLinkService.id

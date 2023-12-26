@@ -63,6 +63,8 @@ param acrPrivateEndpointName string = 'AcrPrivateEndpoint'
 @description('Specifies the resource id of the Azure Container Registry.')
 param acrId string = ''
 
+param pipName string
+
 var acagen2Subnet = {
   name: acagen2SubnetName
   properties: {
@@ -264,6 +266,19 @@ resource apimSubnetNsg 'Microsoft.Network/networkSecurityGroups@2021-08-01' = {
         }
       }
       {
+        name: 'TrafficManagerMultiRegionInbound'
+        properties: {
+          protocol: 'Tcp'
+          sourcePortRange: '*'
+          destinationPortRange: '443'
+          sourceAddressPrefix: 'AzureTrafficManager'
+          destinationAddressPrefix: 'VirtualNetwork'
+          access: 'Allow'
+          priority: 190
+          direction: 'Inbound'
+        }
+      }
+      {
         name: 'DependencyOnAzureSQLOutbound'
         properties: {
           protocol: 'Tcp'
@@ -457,16 +472,30 @@ resource apimSubnetStv2Nsg 'Microsoft.Network/networkSecurityGroups@2021-08-01' 
           direction: 'Inbound'
         }
       }
+      // NSG changes for APIM stv2
       {
         name: 'AzureInfrastructureLoadBalancer'
         properties: {
           protocol: 'Tcp'
           sourcePortRange: '*'
-          destinationPortRange: '*'
+          destinationPortRange: '6390'
           sourceAddressPrefix: 'AzureLoadBalancer'
           destinationAddressPrefix: 'VirtualNetwork'
           access: 'Allow'
           priority: 180
+          direction: 'Inbound'
+        }
+      }
+      {
+        name: 'TrafficManagerMultiRegionInbound'
+        properties: {
+          protocol: 'Tcp'
+          sourcePortRange: '*'
+          destinationPortRange: '443'
+          sourceAddressPrefix: 'AzureTrafficManager'
+          destinationAddressPrefix: 'VirtualNetwork'
+          access: 'Allow'
+          priority: 190
           direction: 'Inbound'
         }
       }
@@ -602,6 +631,20 @@ resource apimSubnetStv2Nsg 'Microsoft.Network/networkSecurityGroups@2021-08-01' 
           direction: 'Outbound'
         }
       }
+      // NSG changes for APIM stv2
+      {
+        name: 'DependencyOnKeyVaultOutbound'
+        properties: {
+          protocol: 'Tcp'
+          sourcePortRange: '*'
+          destinationPortRange: '443'
+          sourceAddressPrefix: 'VirtualNetwork'
+          destinationAddressPrefix: 'AzureKeyVault'
+          access: 'Allow'
+          priority: 310
+          direction: 'Outbound'
+        }
+      }
     ]
   }
 }
@@ -710,6 +753,19 @@ resource acrPrivateDnsZoneGroup 'Microsoft.Network/privateEndpoints/privateDnsZo
         }
       }
     ]
+  }
+}
+
+// Private IP for APIM migration to stv2 (In internal VNet mode, this public IP address is used only for management operations.)
+resource publicip 'Microsoft.Network/publicIPAddresses@2022-05-01' = {
+  name: pipName
+  location: location
+  properties: {
+    publicIPAllocationMethod: 'Static'
+  }
+  sku: {
+    name: 'Standard'
+    tier: 'Global'
   }
 }
 

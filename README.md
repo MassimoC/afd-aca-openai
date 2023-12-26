@@ -65,3 +65,4 @@ docker login -u massimocrippa -p yeahsure
 docker tag chatgpt-ui:1.0.6 massimocrippa/chatgpt-ui:1.0.6
 docker push massimocrippa/chatgpt-ui:1.0.6
 ```
+

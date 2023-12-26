@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.23.1.45101",
-      "templateHash": "18159369662308696251"
+      "templateHash": "14684586112570096497"
     }
   },
   "parameters": {
@@ -56,6 +56,7 @@
     "frontDoorName": "[format('afd{0}', variables('projectName'))]",
     "msiName": "[format('msi{0}', variables('projectName'))]",
     "appChatName": "[format('chat-{0}', variables('projectName'))]",
+    "pipName": "[format('pip-{0}-apimstv2', variables('projectName'))]",
     "chatGptDeploymentName": "[format('gpt{0}', variables('projectName'))]",
     "chatGptModelName": "gpt-35-turbo",
     "chatGptModelVersion": "0301",
@@ -3444,6 +3445,9 @@
           "acrId": {
             "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('resourceGroupName')), 'Microsoft.Resources/deployments', take(format('{0}-acr', variables('deploymentName')), 58)), '2022-09-01').outputs.resourceId.value]"
           },
+          "pipName": {
+            "value": "[variables('pipName')]"
+          },
           "location": {
             "value": "[parameters('location')]"
           }
@@ -3455,7 +3459,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.23.1.45101",
-              "templateHash": "17684594592850747994"
+              "templateHash": "8574158302005460096"
             }
           },
           "parameters": {
@@ -3518,6 +3522,14 @@
               "type": "string",
               "defaultValue": "10.3.0.0/23"
             },
+            "apimSubnetStv2Name": {
+              "type": "string",
+              "defaultValue": "apimSubnetStv2"
+            },
+            "apimSubnetStv2AddressPrefix": {
+              "type": "string",
+              "defaultValue": "10.6.0.0/27"
+            },
             "peSubnetName": {
               "type": "string",
               "defaultValue": "PrivateEndpointSubnet"
@@ -3541,6 +3553,10 @@
             "apimSubnetNsgName": {
               "type": "string",
               "defaultValue": "apimSubnetNsg"
+            },
+            "apimSubnetStv2NsgName": {
+              "type": "string",
+              "defaultValue": "apimSubnetStv2Nsg"
             },
             "natGatewayName": {
               "type": "string"
@@ -3581,6 +3597,9 @@
               "metadata": {
                 "description": "Specifies the resource id of the Azure Container Registry."
               }
+            },
+            "pipName": {
+              "type": "string"
             }
           },
           "variables": {
@@ -3655,7 +3674,20 @@
                 "delegations": []
               }
             },
-            "subnets": "[union(array(variables('acagen2Subnet')), array(variables('testSubnet')), array(variables('apimSubnet')), array(variables('acagen1Subnet')), array(variables('peSubnet')), array(variables('plsSubnet')))]"
+            "apimSubnetStv2": {
+              "name": "[parameters('apimSubnetStv2Name')]",
+              "properties": {
+                "addressPrefix": "[parameters('apimSubnetStv2AddressPrefix')]",
+                "networkSecurityGroup": {
+                  "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('apimSubnetStv2NsgName'))]"
+                },
+                "privateEndpointNetworkPolicies": "Disabled",
+                "privateLinkServiceNetworkPolicies": "Enabled",
+                "natGateway": "[if(parameters('natGatewayEnabled'), createObject('id', resourceId('Microsoft.Network/natGateways', parameters('natGatewayName'))), null())]",
+                "delegations": []
+              }
+            },
+            "subnets": "[union(array(variables('acagen2Subnet')), array(variables('testSubnet')), array(variables('apimSubnet')), array(variables('acagen1Subnet')), array(variables('peSubnet')), array(variables('plsSubnet')), array(variables('apimSubnetStv2')))]"
           },
           "resources": [
             {
@@ -3751,6 +3783,19 @@
                       "destinationAddressPrefix": "VirtualNetwork",
                       "access": "Allow",
                       "priority": 180,
+                      "direction": "Inbound"
+                    }
+                  },
+                  {
+                    "name": "TrafficManagerMultiRegionInbound",
+                    "properties": {
+                      "protocol": "Tcp",
+                      "sourcePortRange": "*",
+                      "destinationPortRange": "443",
+                      "sourceAddressPrefix": "AzureTrafficManager",
+                      "destinationAddressPrefix": "VirtualNetwork",
+                      "access": "Allow",
+                      "priority": 190,
                       "direction": "Inbound"
                     }
                   },
@@ -3890,6 +3935,239 @@
               }
             },
             {
+              "type": "Microsoft.Network/networkSecurityGroups",
+              "apiVersion": "2021-08-01",
+              "name": "[parameters('apimSubnetStv2NsgName')]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "securityRules": [
+                  {
+                    "name": "ClientCommunicationToAPIManagementInbound",
+                    "properties": {
+                      "protocol": "Tcp",
+                      "sourcePortRange": "*",
+                      "destinationPortRange": "80",
+                      "sourceAddressPrefix": "VirtualNetwork",
+                      "destinationAddressPrefix": "VirtualNetwork",
+                      "access": "Allow",
+                      "priority": 100,
+                      "direction": "Inbound"
+                    }
+                  },
+                  {
+                    "name": "SecureClientCommunicationToAPIManagementInbound",
+                    "properties": {
+                      "protocol": "Tcp",
+                      "sourcePortRange": "*",
+                      "destinationPortRange": "443",
+                      "sourceAddressPrefix": "VirtualNetwork",
+                      "destinationAddressPrefix": "VirtualNetwork",
+                      "access": "Allow",
+                      "priority": 110,
+                      "direction": "Inbound"
+                    }
+                  },
+                  {
+                    "name": "ManagementEndpointForAzurePortalAndPowershellInbound",
+                    "properties": {
+                      "protocol": "Tcp",
+                      "sourcePortRange": "*",
+                      "destinationPortRange": "3443",
+                      "sourceAddressPrefix": "ApiManagement",
+                      "destinationAddressPrefix": "VirtualNetwork",
+                      "access": "Allow",
+                      "priority": 120,
+                      "direction": "Inbound"
+                    }
+                  },
+                  {
+                    "name": "DependencyOnRedisCacheInbound",
+                    "properties": {
+                      "protocol": "Tcp",
+                      "sourcePortRange": "*",
+                      "destinationPortRange": "6381-6383",
+                      "sourceAddressPrefix": "VirtualNetwork",
+                      "destinationAddressPrefix": "VirtualNetwork",
+                      "access": "Allow",
+                      "priority": 130,
+                      "direction": "Inbound"
+                    }
+                  },
+                  {
+                    "name": "AzureInfrastructureLoadBalancer",
+                    "properties": {
+                      "protocol": "Tcp",
+                      "sourcePortRange": "*",
+                      "destinationPortRange": "6390",
+                      "sourceAddressPrefix": "AzureLoadBalancer",
+                      "destinationAddressPrefix": "VirtualNetwork",
+                      "access": "Allow",
+                      "priority": 180,
+                      "direction": "Inbound"
+                    }
+                  },
+                  {
+                    "name": "TrafficManagerMultiRegionInbound",
+                    "properties": {
+                      "protocol": "Tcp",
+                      "sourcePortRange": "*",
+                      "destinationPortRange": "443",
+                      "sourceAddressPrefix": "AzureTrafficManager",
+                      "destinationAddressPrefix": "VirtualNetwork",
+                      "access": "Allow",
+                      "priority": 190,
+                      "direction": "Inbound"
+                    }
+                  },
+                  {
+                    "name": "DependencyOnAzureSQLOutbound",
+                    "properties": {
+                      "protocol": "Tcp",
+                      "sourcePortRange": "*",
+                      "destinationPortRange": "1433",
+                      "sourceAddressPrefix": "VirtualNetwork",
+                      "destinationAddressPrefix": "Sql",
+                      "access": "Allow",
+                      "priority": 140,
+                      "direction": "Outbound"
+                    }
+                  },
+                  {
+                    "name": "DependencyForLogToEventHubPolicyOutbound",
+                    "properties": {
+                      "protocol": "*",
+                      "sourcePortRange": "*",
+                      "destinationPortRange": "5671",
+                      "sourceAddressPrefix": "VirtualNetwork",
+                      "destinationAddressPrefix": "EventHub",
+                      "access": "Allow",
+                      "priority": 150,
+                      "direction": "Outbound"
+                    }
+                  },
+                  {
+                    "name": "DependencyOnRedisCacheOutbound",
+                    "properties": {
+                      "protocol": "Tcp",
+                      "sourcePortRange": "*",
+                      "destinationPortRange": "6381-6383",
+                      "sourceAddressPrefix": "VirtualNetwork",
+                      "destinationAddressPrefix": "VirtualNetwork",
+                      "access": "Allow",
+                      "priority": 160,
+                      "direction": "Outbound"
+                    }
+                  },
+                  {
+                    "name": "DependencyOnAzureFileShareForGitOutbound",
+                    "properties": {
+                      "protocol": "Tcp",
+                      "sourcePortRange": "*",
+                      "destinationPortRange": "445",
+                      "sourceAddressPrefix": "VirtualNetwork",
+                      "destinationAddressPrefix": "Storage",
+                      "access": "Allow",
+                      "priority": 170,
+                      "direction": "Outbound"
+                    }
+                  },
+                  {
+                    "name": "PublishDiagnosticLogsAndMetricsOutbound",
+                    "properties": {
+                      "description": "APIM Logs and Metrics for consumption by admins and your IT team are all part of the management plane",
+                      "protocol": "Tcp",
+                      "sourcePortRange": "*",
+                      "sourceAddressPrefix": "VirtualNetwork",
+                      "destinationAddressPrefix": "AzureMonitor",
+                      "access": "Allow",
+                      "priority": 185,
+                      "direction": "Outbound",
+                      "destinationPortRanges": [
+                        "443",
+                        "12000",
+                        "1886"
+                      ]
+                    }
+                  },
+                  {
+                    "name": "ConnectToSmtpRelayForSendingEmailsOutbound",
+                    "properties": {
+                      "description": "APIM features the ability to generate email traffic as part of the data plane and the management plane",
+                      "protocol": "Tcp",
+                      "sourcePortRange": "*",
+                      "sourceAddressPrefix": "VirtualNetwork",
+                      "destinationAddressPrefix": "Internet",
+                      "access": "Allow",
+                      "priority": 190,
+                      "direction": "Outbound",
+                      "destinationPortRanges": [
+                        "25",
+                        "587",
+                        "25028"
+                      ]
+                    }
+                  },
+                  {
+                    "name": "AuthenticateToAzureActiveDirectoryOutbound",
+                    "properties": {
+                      "description": "Connect to Azure Active Directory for Developer Portal Authentication or for Oauth2 flow during any Proxy Authentication",
+                      "protocol": "Tcp",
+                      "sourcePortRange": "*",
+                      "sourceAddressPrefix": "VirtualNetwork",
+                      "destinationAddressPrefix": "AzureActiveDirectory",
+                      "access": "Allow",
+                      "priority": 200,
+                      "direction": "Outbound",
+                      "destinationPortRanges": [
+                        "80",
+                        "443"
+                      ]
+                    }
+                  },
+                  {
+                    "name": "DependencyOnAzureStorageOutbound",
+                    "properties": {
+                      "description": "APIM service dependency on Azure Blob and Azure Table Storage",
+                      "protocol": "Tcp",
+                      "sourcePortRange": "*",
+                      "destinationPortRange": "443",
+                      "sourceAddressPrefix": "VirtualNetwork",
+                      "destinationAddressPrefix": "Storage",
+                      "access": "Allow",
+                      "priority": 100,
+                      "direction": "Outbound"
+                    }
+                  },
+                  {
+                    "name": "PublishMonitoringLogsOutbound",
+                    "properties": {
+                      "protocol": "Tcp",
+                      "sourcePortRange": "*",
+                      "destinationPortRange": "443",
+                      "sourceAddressPrefix": "VirtualNetwork",
+                      "destinationAddressPrefix": "AzureCloud",
+                      "access": "Allow",
+                      "priority": 300,
+                      "direction": "Outbound"
+                    }
+                  },
+                  {
+                    "name": "DependencyOnKeyVaultOutbound",
+                    "properties": {
+                      "protocol": "Tcp",
+                      "sourcePortRange": "*",
+                      "destinationPortRange": "443",
+                      "sourceAddressPrefix": "VirtualNetwork",
+                      "destinationAddressPrefix": "AzureKeyVault",
+                      "access": "Allow",
+                      "priority": 310,
+                      "direction": "Outbound"
+                    }
+                  }
+                ]
+              }
+            },
+            {
               "type": "Microsoft.Network/virtualNetworks",
               "apiVersion": "2021-08-01",
               "name": "[parameters('virtualNetworkName')]",
@@ -3905,6 +4183,7 @@
               },
               "dependsOn": [
                 "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('apimSubnetNsgName'))]",
+                "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('apimSubnetStv2NsgName'))]",
                 "[resourceId('Microsoft.Network/natGateways', parameters('natGatewayName'))]"
               ]
             },
@@ -4021,6 +4300,19 @@
                 "[resourceId('Microsoft.Network/privateDnsZones', format('privatelink.{0}', if(equals(toLower(environment().name), 'azureusgovernment'), 'azurecr.us', 'azurecr.io')))]",
                 "[resourceId('Microsoft.Network/privateEndpoints', parameters('acrPrivateEndpointName'))]"
               ]
+            },
+            {
+              "type": "Microsoft.Network/publicIPAddresses",
+              "apiVersion": "2022-05-01",
+              "name": "[parameters('pipName')]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "publicIPAllocationMethod": "Static"
+              },
+              "sku": {
+                "name": "Standard",
+                "tier": "Global"
+              }
             }
           ],
           "outputs": {
@@ -8100,6 +8392,9 @@
           "peSubnetId": {
             "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('resourceGroupName')), 'Microsoft.Resources/deployments', take(format('{0}-networking', variables('deploymentName')), 58)), '2022-09-01').outputs.peSubnetId.value]"
           },
+          "apimResourceId": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('resourceGroupName')), 'Microsoft.Resources/deployments', take(format('{0}-apim', variables('deploymentName')), 58)), '2022-09-01').outputs.resourceId.value]"
+          },
           "location": {
             "value": "[parameters('location')]"
           },
@@ -8117,7 +8412,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.23.1.45101",
-              "templateHash": "17412524956612964262"
+              "templateHash": "8650988930622654152"
             }
           },
           "parameters": {
@@ -8134,6 +8429,9 @@
               "type": "string"
             },
             "peSubnetId": {
+              "type": "string"
+            },
+            "apimResourceId": {
               "type": "string"
             },
             "acaDefaultDomainName": {
@@ -8241,6 +8539,7 @@
       },
       "dependsOn": [
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('resourceGroupName')), 'Microsoft.Resources/deployments', take(format('{0}-acaenv', variables('deploymentName')), 58))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('resourceGroupName')), 'Microsoft.Resources/deployments', take(format('{0}-apim', variables('deploymentName')), 58))]",
         "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('resourceGroupName')), 'Microsoft.Resources/deployments', take(format('{0}-networking', variables('deploymentName')), 58))]"
       ]
     },

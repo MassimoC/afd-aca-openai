@@ -33,6 +33,7 @@ var loadBalancerName = 'kubernetes-internal'
 var frontDoorName = 'afd${projectName}'
 var msiName = 'msi${projectName}'
 var appChatName = 'chat-${projectName}'
+var pipName = 'pip-${projectName}-apimstv2'
 
 var chatGptDeploymentName = 'gpt${projectName}'
 var chatGptModelName = 'gpt-35-turbo'
@@ -124,6 +125,7 @@ module modNetworking 'modules/network.bicep' = {
     createAcrPrivateEndpoint:true
     acrPrivateEndpointName: 'pe-acr-${acrName}'
     acrId: containerRegistry.outputs.resourceId
+    pipName:pipName
     location: location
   }
   dependsOn: [
@@ -252,6 +254,7 @@ module modPrivateLinkService 'modules/privatelink.bicep' = {
     acaDefaultDomainName: modAcaEnvironment.outputs.defaultDomain
     subnetId: modNetworking.outputs.plsSubnetId
     peSubnetId :modNetworking.outputs.peSubnetId
+    apimResourceId: modApim.outputs.resourceId
     location: location
     tags: tags
     pepName:pepName
