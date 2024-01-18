@@ -217,7 +217,7 @@ resource service 'Microsoft.ApiManagement/service@2023-05-01-preview' = {
     capacity: skuCount
   }
   zones: zones
-  identity: identity
+  identity: {type:'None'}
   properties: {
     publisherEmail: publisherEmail
     publisherName: publisherName

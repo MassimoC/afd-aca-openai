@@ -33,7 +33,7 @@ var loadBalancerName = 'kubernetes-internal'
 var frontDoorName = 'afd${projectName}'
 var msiName = 'msi${projectName}'
 var appChatName = 'chat-${projectName}'
-var pipName = 'pip-${projectName}-apimstv2'
+var pipName = 'pip-${projectName}-apimstv2x'
 
 var chatGptDeploymentName = 'gpt${projectName}'
 var chatGptModelName = 'gpt-35-turbo'
