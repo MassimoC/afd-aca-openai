@@ -10,16 +10,15 @@ This test lab implement / uses / is inspired by the following articles and examp
 
 # Architecture
 
+TODO
 
 
 ## Test from ACI
 
+Call the OpenAI endpoint directly
+
 ```
 curl https://ai-holaday.openai.azure.com/ -iv
-
-curl http://app-01--tnsnrrp.yellowstone-32fc685b.westeurope.azurecontainerapps.io/ -iv
-
-curl https://apim-holafay.azure-api.net/status-0123456789abcdef -iv
 
 # completions (open ai private endpoint)
 curl https://ai-holafay.openai.azure.com/openai/deployments/gptholafay/completions?api-version=2023-05-15 -H "Content-Type: application/json" -H "api-key: 2af3ea4065dd492c820c6ae8df65705b" -d "{\"prompt\": \"Once upon a time\", \"max_tokens\": 5}"
@@ -27,12 +26,33 @@ curl https://ai-holafay.openai.azure.com/openai/deployments/gptholafay/completio
 # chat/completions (open ai private endpoint)
 curl https://ai-holafay.openai.azure.com/openai/deployments/gptholafay/chat/completions?api-version=2023-05-15 -H "Content-Type: application/json" -H "api-key: 2af3ea4065dd492c820c6ae8df65705b" -d "{\"model\": \"gpt-35-turbo\",\"messages\": [{\"role\": \"user\",\"content\": \"What API means for you?\"}]}"
 
+```
+
+Validate azure default domains resolution.
+
+```
+
+curl http://app-01--tnsnrrp.yellowstone-32fc685b.westeurope.azurecontainerapps.io/ -iv
+
+curl https://apim-holafay.azure-api.net/status-0123456789abcdef -iv
+```
+
+Call the OpenAI api exposed in the APIM managed gateway (note the OpenAI api is hosted in both self-hosted and managed gatway).
+
+```
 # chat/completions (via APIM internal)
 curl https://apim-holafay.azure-api.net/openai/deployments/gptholafay/chat/completions?api-version=2023-05-15 -H "Content-Type: application/json" -H "api-key: 2af3ea4065dd492c820c6ae8df65705b" -H "package-key: 875ea2746ea942a8afaeaca284b8c138"  -d "{\"model\": \"gpt-35-turbo\",\"messages\": [{\"role\": \"user\",\"content\": \"What API means for you?\"}]}"
+```
 
+## Validate publicly available endpoints
+
+Call the OpenAI endpoint exposed via AFD > ACA (selfhosted gateway) > OpenAI
+
+```
 # chat/completions (via afd, APIM gateway on ACA)
 curl https://lab3.apifirst.cloud/openai/deployments/gptholafay/chat/completions?api-version=2023-05-15 -H "Content-Type: application/json" -H "api-key: 2af3ea4065dd492c820c6ae8df65705b" -H "package-key: 875ea2746ea942a8afaeaca284b8c138"  -d "{\"model\": \"gpt-35-turbo\",\"messages\": [{\"role\": \"user\",\"content\": \"What API means for you?\"}]}"
 
+nslookup apim-holafay.azure-api.net
 ```
 
 
@@ -65,4 +85,3 @@ docker login -u massimocrippa -p yeahsure
 docker tag chatgpt-ui:1.0.6 massimocrippa/chatgpt-ui:1.0.6
 docker push massimocrippa/chatgpt-ui:1.0.6
 ```
-
