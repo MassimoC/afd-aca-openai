@@ -165,6 +165,8 @@ param subscriptions array = []
 @description('Optional. The name of the diagnostic setting, if deployed. If left empty, it defaults to "<resourceName>-diagnosticSettings".')
 param diagnosticSettingsName string = ''
 
+param managementPipResourceId string = ''
+
 var enableReferencedModulesTelemetry = false
 
 var authorizationServerList = !empty(authorizationServers) ? authorizationServers.secureList : []
@@ -206,7 +208,7 @@ resource defaultTelemetry 'Microsoft.Resources/deployments@2021-04-01' = if (ena
   }
 }
 
-resource service 'Microsoft.ApiManagement/service@2021-08-01' = {
+resource service 'Microsoft.ApiManagement/service@2023-05-01-preview' = {
   name: name
   location: location
   tags: tags
@@ -226,6 +228,7 @@ resource service 'Microsoft.ApiManagement/service@2021-08-01' = {
     certificates: certificates
     enableClientCertificate: enableClientCertificate ? true : null
     disableGateway: disableGateway
+    publicIpAddressId: managementPipResourceId
     virtualNetworkType: virtualNetworkType
     virtualNetworkConfiguration: !empty(subnetResourceId) ? {
       subnetResourceId: subnetResourceId

@@ -760,12 +760,14 @@ resource acrPrivateDnsZoneGroup 'Microsoft.Network/privateEndpoints/privateDnsZo
 resource publicip 'Microsoft.Network/publicIPAddresses@2022-05-01' = {
   name: pipName
   location: location
-  properties: {
-    publicIPAllocationMethod: 'Static'
-  }
   sku: {
     name: 'Standard'
-    tier: 'Global'
+  }
+  properties: {
+    publicIPAllocationMethod: 'Static'
+    dnsSettings:{
+      domainNameLabel:  toLower('${pipName}')
+    }
   }
 }
 
@@ -775,12 +777,15 @@ output virtualNetworkName string = vnet.name
 output acagen2SubnetId string = resourceId('Microsoft.Network/virtualNetworks/subnets', vnet.name, acagen2SubnetName)
 output testSubnetId string = resourceId('Microsoft.Network/virtualNetworks/subnets', vnet.name, testSubnetName)
 output apimSubnetId string = resourceId('Microsoft.Network/virtualNetworks/subnets', vnet.name, apimSubnetName)
+output apimSubnetStv2Id string = resourceId('Microsoft.Network/virtualNetworks/subnets', vnet.name, apimSubnetStv2Name)
 output acagen1SubnetId string = resourceId('Microsoft.Network/virtualNetworks/subnets', vnet.name, acagen1SubnetName)
 output peSubnetId string = resourceId('Microsoft.Network/virtualNetworks/subnets', vnet.name, peSubnetName)
 output plsSubnetId string = resourceId('Microsoft.Network/virtualNetworks/subnets', vnet.name, plsSubnetName)
 output acagen2SubnetName string = acagen2SubnetName
 output testSubnetName string = testSubnetName
 output apimSubnetName string = apimSubnetName
+output apimSubnetStv2Name string = apimSubnetStv2Name
 output acagen1SubnetName string = acagen1SubnetName
 output peSubnetName string = peSubnetName
 output plsSubnetName string = plsSubnetName
+output pipApimStv2Id string = publicip.id

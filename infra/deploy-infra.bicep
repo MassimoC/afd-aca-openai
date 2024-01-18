@@ -185,7 +185,8 @@ module modApim 'CARML/api-management/service/main.bicep' = {
     publisherEmail: 'massimo.crippa@codit.eu'
     publisherName: projectName
     virtualNetworkType:'Internal'
-    subnetResourceId : modNetworking.outputs.apimSubnetId
+    subnetResourceId : modNetworking.outputs.apimSubnetStv2Id
+    managementPipResourceId : modNetworking.outputs.pipApimStv2Id
     minApiVersion: '2021-08-01'
   }
   dependsOn:[
